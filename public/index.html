@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MangoGrove — Fresh Mangoes Delivered</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#E8940A;--deep:#B46A00;--light:#FFF3D6;--cream:#FFFAF0;
+  --green:#2D6A35;--dark:#1A1207;--mid:#5C4A1E;--soft:#9A7B3A;
+  --surface:#FFFDF7;--card:#FFFFFF;--border:rgba(180,106,0,0.15);
+  --shadow:0 4px 24px rgba(180,106,0,0.10);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--dark)}
+a{text-decoration:none;color:inherit}
+
+/* NAV */
+nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100}
+.logo{font-family:'Playfair Display',serif;font-size:22px;color:var(--gold);display:flex;align-items:center;gap:8px;cursor:pointer}
+.nav-links{display:flex;gap:2rem;align-items:center}
+.nav-links a{color:var(--mid);font-size:14px;font-weight:500;cursor:pointer;transition:color .2s}
+.nav-links a:hover,.nav-links a.active{color:var(--gold)}
+.cart-btn{background:var(--gold);color:white;border:none;border-radius:24px;padding:8px 20px;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'DM Sans',sans-serif;transition:background .2s}
+.cart-btn:hover{background:var(--deep)}
+.cart-badge{background:white;color:var(--gold);border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+
+/* PAGES */
+.page{display:none}.page.active{display:block}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#FFF8E6 0%,#FFF0C2 50%,#FFE5A0 100%);padding:5rem 2rem 4rem;display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;max-width:1100px;margin:0 auto}
+.hero h1{font-family:'Playfair Display',serif;font-size:52px;line-height:1.1;margin-bottom:1.2rem}
+.hero h1 em{color:var(--gold);font-style:italic}
+.hero p{color:var(--mid);font-size:17px;line-height:1.7;margin-bottom:2rem;font-weight:300}
+.hero-btns{display:flex;gap:1rem;flex-wrap:wrap}
+.mango-big{font-size:160px;animation:floatMango 3s ease-in-out infinite;filter:drop-shadow(0 20px 40px rgba(180,106,0,0.25));text-align:center}
+@keyframes floatMango{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+.hero-stats{display:flex;gap:2rem;margin-top:2.5rem}
+.stat-num{font-family:'Playfair Display',serif;font-size:28px;color:var(--gold);font-weight:700}
+.stat-label{font-size:12px;color:var(--soft);text-transform:uppercase;letter-spacing:.05em}
+
+/* BUTTONS */
+.btn-primary{background:var(--gold);color:white;border:none;border-radius:28px;padding:14px 32px;font-size:15px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.btn-primary:hover{background:var(--deep);transform:translateY(-1px)}
+.btn-outline{background:transparent;color:var(--deep);border:1.5px solid var(--deep);border-radius:28px;padding:13px 28px;font-size:15px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.btn-outline:hover{background:var(--light)}
+.btn-sm{padding:8px 18px;font-size:13px;border-radius:20px}
+
+/* BADGES STRIP */
+.badges-strip{background:var(--green);padding:12px 2rem;display:flex;justify-content:center;gap:3rem;flex-wrap:wrap}
+.badge-item{color:white;font-size:13px;display:flex;align-items:center;gap:6px}
+.badge-dot{width:6px;height:6px;background:#FFD54F;border-radius:50%}
+
+/* SECTIONS */
+.section{max-width:1100px;margin:0 auto;padding:4rem 2rem}
+.section-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:2rem}
+.section-title{font-family:'Playfair Display',serif;font-size:32px;color:var(--dark)}
+.section-link{color:var(--soft);font-size:14px;cursor:pointer}
+.section-link:hover{color:var(--gold)}
+
+/* FILTER PILLS */
+.filter-pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:2rem}
+.pill{border:1.5px solid var(--border);border-radius:20px;padding:6px 16px;font-size:13px;cursor:pointer;background:white;color:var(--mid);transition:all .2s;font-family:'DM Sans',sans-serif}
+.pill.active,.pill:hover{background:var(--gold);color:white;border-color:var(--gold)}
+
+/* PRODUCT CARDS */
+.product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1.5rem}
+.product-card{background:var(--card);border-radius:20px;border:1px solid var(--border);padding:1.5rem;display:flex;flex-direction:column;gap:12px;transition:all .25s;position:relative;overflow:hidden}
+.product-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--gold),#FFD54F);opacity:0;transition:opacity .2s}
+.product-card:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+.product-card:hover::before{opacity:1}
+.product-emoji{font-size:64px;text-align:center;margin:.5rem 0}
+.product-name{font-family:'Playfair Display',serif;font-size:18px;color:var(--dark)}
+.product-origin{font-size:12px;color:var(--soft)}
+.product-desc{font-size:13px;color:var(--mid);line-height:1.6;font-weight:300}
+.product-footer{display:flex;align-items:center;justify-content:space-between;margin-top:auto}
+.product-price{font-family:'Playfair Display',serif;font-size:22px;color:var(--gold);font-weight:700}
+.product-price span{font-size:13px;color:var(--soft);font-family:'DM Sans',sans-serif;font-weight:400}
+.add-btn{background:var(--light);border:1.5px solid var(--gold);color:var(--deep);border-radius:12px;padding:8px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.add-btn:hover{background:var(--gold);color:white}
+.add-btn:disabled{opacity:.4;cursor:not-allowed}
+.tag{font-size:11px;padding:3px 10px;border-radius:10px;font-weight:500;display:inline-block}
+.tag-fresh{background:#E8F5E9;color:#2D6A35}
+.tag-seasonal{background:#FFF3E0;color:#E65100}
+.tag-bulk{background:#EDE7F6;color:#4527A0}
+.stock-indicator{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--soft)}
+.stock-dot{width:6px;height:6px;border-radius:50%;background:#4CAF50}
+.stock-dot.low{background:#FF9800}
+.stock-dot.out{background:#F44336}
+
+/* CART */
+.cart-page{max-width:800px;margin:0 auto;padding:3rem 2rem}
+.cart-title{font-family:'Playfair Display',serif;font-size:32px;margin-bottom:2rem}
+.cart-item{background:white;border:1px solid var(--border);border-radius:16px;padding:1.25rem 1.5rem;display:flex;align-items:center;gap:1rem;margin-bottom:1rem}
+.cart-item-emoji{font-size:40px}
+.cart-item-info{flex:1}
+.cart-item-name{font-weight:500;font-size:15px}
+.cart-item-price{color:var(--soft);font-size:13px}
+.qty-control{display:flex;align-items:center;gap:10px}
+.qty-btn{background:var(--light);border:1px solid var(--gold);color:var(--deep);width:28px;height:28px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s;font-family:'DM Sans',sans-serif}
+.qty-btn:hover{background:var(--gold);color:white}
+.qty-num{font-weight:500;min-width:20px;text-align:center}
+.cart-item-total{font-family:'Playfair Display',serif;font-size:18px;color:var(--gold);font-weight:700;min-width:70px;text-align:right}
+.remove-btn{background:none;border:none;color:#E57373;cursor:pointer;font-size:18px;padding:4px;transition:transform .2s}
+.remove-btn:hover{transform:scale(1.2)}
+.cart-summary{background:var(--light);border:1px solid var(--border);border-radius:16px;padding:1.5rem 2rem;margin-top:2rem}
+.summary-row{display:flex;justify-content:space-between;margin-bottom:10px;font-size:14px;color:var(--mid)}
+.summary-total{display:flex;justify-content:space-between;border-top:1px solid var(--border);padding-top:12px;margin-top:4px}
+.summary-total span{font-family:'Playfair Display',serif;font-size:22px;color:var(--gold);font-weight:700}
+.checkout-btn-full{background:var(--gold);color:white;border:none;border-radius:28px;padding:16px;font-size:16px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;width:100%;margin-top:1.5rem;transition:background .2s}
+.checkout-btn-full:hover{background:var(--deep)}
+.empty-cart{text-align:center;padding:4rem;color:var(--soft)}
+.empty-icon{font-size:80px;margin-bottom:1rem;display:block}
+
+/* CHECKOUT */
+.checkout-wrapper{max-width:680px;margin:0 auto;padding:3rem 2rem}
+.checkout-title{font-family:'Playfair Display',serif;font-size:28px;margin-bottom:2rem}
+.checkout-section{background:white;border:1px solid var(--border);border-radius:16px;padding:1.5rem;margin-bottom:1.5rem}
+.checkout-section h4{font-weight:500;font-size:15px;margin-bottom:1rem;color:var(--dark)}
+.form-group{margin-bottom:1.2rem}
+.form-label{font-size:13px;font-weight:500;color:var(--mid);margin-bottom:6px;display:block}
+.form-input{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--dark);background:var(--cream);transition:border-color .2s;outline:none}
+.form-input:focus{border-color:var(--gold)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.radio-group{display:flex;flex-direction:column;gap:10px}
+.radio-group label{display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px;color:var(--mid)}
+.success-msg{background:#E8F5E9;border:1px solid #A5D6A7;border-radius:14px;padding:2rem;text-align:center;color:#2E7D32}
+.success-icon{font-size:56px;display:block;margin-bottom:10px}
+
+/* ADMIN */
+.admin-page{max-width:1000px;margin:0 auto;padding:2rem}
+.admin-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem}
+.admin-title{font-family:'Playfair Display',serif;font-size:28px}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}
+.stat-card{background:white;border-radius:16px;border:1px solid var(--border);padding:1.25rem}
+.stat-card-label{font-size:12px;color:var(--soft);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.stat-card-val{font-family:'Playfair Display',serif;font-size:28px;color:var(--dark);font-weight:700}
+.stat-card-sub{font-size:12px;color:#4CAF50;margin-top:4px}
+.stat-card-sub.warn{color:#FF9800}
+.admin-tabs{display:flex;gap:4px;background:var(--light);border-radius:12px;padding:4px;margin-bottom:2rem}
+.admin-tab{padding:8px 20px;border-radius:10px;cursor:pointer;font-size:14px;font-weight:500;color:var(--mid);transition:all .2s;font-family:'DM Sans',sans-serif;border:none;background:none}
+.admin-tab.active{background:white;color:var(--deep);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.admin-panel{background:white;border-radius:16px;border:1px solid var(--border);overflow:hidden}
+.admin-panel-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.panel-title{font-weight:500;font-size:15px}
+.add-btn-admin{background:var(--gold);color:white;border:none;border-radius:10px;padding:8px 16px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s}
+.add-btn-admin:hover{background:var(--deep)}
+.admin-table{width:100%;border-collapse:collapse;font-size:14px}
+.admin-table th{padding:10px 1.5rem;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--soft);font-weight:500;border-bottom:1px solid var(--border)}
+.admin-table td{padding:14px 1.5rem;border-bottom:1px solid rgba(180,106,0,0.06);vertical-align:middle}
+.admin-table tr:last-child td{border-bottom:none}
+.admin-table tr:hover td{background:var(--cream)}
+.edit-btn{background:var(--light);border:1px solid var(--gold);color:var(--deep);border-radius:8px;padding:5px 12px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif}
+.del-btn{background:#FFEBEE;border:1px solid #FFCDD2;color:#C62828;border-radius:8px;padding:5px 12px;font-size:12px;cursor:pointer;margin-left:6px;font-family:'DM Sans',sans-serif}
+.order-status-select{font-family:'DM Sans',sans-serif;border:1px solid var(--border);background:transparent;cursor:pointer;padding:4px 8px;border-radius:10px;font-size:12px;font-weight:500}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:200}
+.modal-overlay.open{display:flex}
+.modal{background:white;border-radius:20px;padding:2rem;width:480px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto}
+.modal h3{font-family:'Playfair Display',serif;font-size:22px;margin-bottom:1.5rem}
+.modal-footer{display:flex;justify-content:flex-end;gap:1rem;margin-top:1.5rem}
+.btn-cancel{background:none;border:1.5px solid var(--border);border-radius:24px;padding:10px 20px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--mid)}
+.btn-save{background:var(--gold);color:white;border:none;border-radius:24px;padding:10px 24px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500}
+.btn-save:hover{background:var(--deep)}
+
+/* TESTIMONIALS */
+.testimonials{background:linear-gradient(135deg,#FFF8E6,#FFF3D6);padding:4rem 2rem}
+.testimonials-inner{max-width:1100px;margin:0 auto}
+.test-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:2rem}
+.test-card{background:white;border-radius:16px;border:1px solid var(--border);padding:1.5rem}
+.stars{color:var(--gold);font-size:14px;margin-bottom:10px}
+.test-text{font-size:14px;color:var(--mid);line-height:1.7;font-style:italic;margin-bottom:12px}
+.test-author{font-size:13px;font-weight:500}
+
+/* LOW STOCK ALERT */
+.alert-box{background:#FFF8E1;border:1px solid #FFE082;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.5rem;font-size:13px;color:#E65100}
+
+/* TOAST */
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#2D6A35;color:white;padding:12px 24px;border-radius:24px;font-size:14px;z-index:9999;font-family:'DM Sans',sans-serif;box-shadow:0 4px 20px rgba(0,0,0,.2);animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateX(-50%) translateY(20px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
+
+/* LOADING */
+.loading{text-align:center;padding:3rem;color:var(--soft);font-size:15px}
+footer{background:var(--dark);color:#D4B483;padding:2rem;text-align:center;font-size:13px}
+footer a{color:var(--gold)}
+
+/* ABOUT */
+.about-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:3rem}
+.about-card{background:var(--light);border-radius:16px;padding:1.5rem;text-align:center}
+.about-icon{font-size:40px;margin-bottom:8px}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo" onclick="showPage('home')">🥭 MangoGrove</div>
+  <div class="nav-links">
+    <a onclick="showPage('home')" id="nav-home" class="active">Home</a>
+    <a onclick="showPage('shop')" id="nav-shop">Shop</a>
+    <a onclick="showPage('about')" id="nav-about">About</a>
+    <a onclick="showPage('admin')" id="nav-admin">Admin ⚙️</a>
+  </div>
+  <button class="cart-btn" onclick="showPage('cart')">🛒 Cart <span class="cart-badge" id="cart-count">0</span></button>
+</nav>
+
+<!-- HOME -->
+<div class="page active" id="page-home">
+  <div style="max-width:1200px;margin:0 auto">
+    <div class="hero">
+      <div class="hero-text">
+        <h1>Straight from the orchard, <em>fresh</em> to your door.</h1>
+        <p>Premium Indian mangoes, handpicked at peak ripeness. Pure, sun-kissed sweetness delivered fresh every season.</p>
+        <div class="hero-btns">
+          <button class="btn-primary" onclick="showPage('shop')">Shop Now →</button>
+          <button class="btn-outline" onclick="showPage('about')">Our Story</button>
+        </div>
+        <div class="hero-stats">
+          <div class="stat"><div class="stat-num" id="home-varieties">—</div><div class="stat-label">Varieties</div></div>
+          <div class="stat"><div class="stat-num" id="home-orders">—</div><div class="stat-label">Orders placed</div></div>
+          <div class="stat"><div class="stat-num">48hr</div><div class="stat-label">Farm to door</div></div>
+        </div>
+      </div>
+      <div><div class="mango-big">🥭</div></div>
+    </div>
+  </div>
+  <div class="badges-strip">
+    <div class="badge-item"><div class="badge-dot"></div> 100% Fresh, Never Frozen</div>
+    <div class="badge-item"><div class="badge-dot"></div> Direct from Ratnagiri &amp; Devgad Farms</div>
+    <div class="badge-item"><div class="badge-dot"></div> Free delivery above ₹999</div>
+    <div class="badge-item"><div class="badge-dot"></div> GI-Certified Alphonso</div>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Fan Favourites</div>
+      <div class="section-link" onclick="showPage('shop')">View all →</div>
+    </div>
+    <div class="product-grid" id="featured-grid"><div class="loading">Loading mangoes…</div></div>
+  </div>
+  <div class="testimonials">
+    <div class="testimonials-inner">
+      <div class="section-title" style="text-align:center;margin-bottom:.5rem">What customers say</div>
+      <div class="test-grid">
+        <div class="test-card"><div class="stars">★★★★★</div><div class="test-text">"The Alphonso mangoes are absolutely divine. Sweet, juicy and arrived perfectly ripe!"</div><div class="test-author">Priya S., Pune</div></div>
+        <div class="test-card"><div class="stars">★★★★★</div><div class="test-text">"Ordered Kesar for my family and everyone was blown away. You can really taste the difference."</div><div class="test-author">Rahul M., Mumbai</div></div>
+        <div class="test-card"><div class="stars">★★★★★</div><div class="test-text">"Fast delivery, beautiful packaging and the mangoes were perfect. MangoGrove is our go-to!"</div><div class="test-author">Anita K., Bangalore</div></div>
+      </div>
+    </div>
+  </div>
+  <footer>Made with 🥭 love · <a href="#">Privacy</a> · <a href="#">Terms</a> · <a href="#">Contact</a></footer>
+</div>
+
+<!-- SHOP -->
+<div class="page" id="page-shop">
+  <div class="section">
+    <div class="section-title" style="margin-bottom:1.5rem">All Mangoes</div>
+    <div class="filter-pills">
+      <span class="pill active" onclick="filterShop('all',this)">All Varieties</span>
+      <span class="pill" onclick="filterShop('premium',this)">Premium</span>
+      <span class="pill" onclick="filterShop('seasonal',this)">Seasonal</span>
+      <span class="pill" onclick="filterShop('bulk',this)">Bulk Deals</span>
+    </div>
+    <div class="product-grid" id="shop-grid"><div class="loading">Loading mangoes…</div></div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div class="page" id="page-about">
+  <div class="section" style="max-width:740px">
+    <div style="font-size:80px;margin-bottom:1.5rem">🌿🥭</div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:38px;line-height:1.2;margin-bottom:1.5rem">Grown with love, <em style="color:var(--gold)">delivered with care.</em></h2>
+    <p style="font-size:16px;color:var(--mid);line-height:1.8;margin-bottom:1.5rem;font-weight:300">MangoGrove was founded with one mission: to connect mango lovers directly with the farmers of Ratnagiri, Devgad and Konkan. No middlemen, no cold storage, no compromise on freshness.</p>
+    <p style="font-size:16px;color:var(--mid);line-height:1.8;font-weight:300">Every box we ship is handpicked, graded by our team, wrapped carefully and dispatched within 24 hours of harvest. This is what mangoes are supposed to taste like.</p>
+    <div class="about-grid">
+      <div class="about-card"><div class="about-icon">🌾</div><div style="font-weight:500">Direct Farms</div><div style="font-size:13px;color:var(--soft);margin-top:4px">40+ family-owned orchards</div></div>
+      <div class="about-card"><div class="about-icon">🚚</div><div style="font-weight:500">Fast Delivery</div><div style="font-size:13px;color:var(--soft);margin-top:4px">48-hour orchard-to-door promise</div></div>
+      <div class="about-card"><div class="about-icon">✅</div><div style="font-weight:500">GI Certified</div><div style="font-size:13px;color:var(--soft);margin-top:4px">Genuine Alphonso with certificate</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- CART -->
+<div class="page" id="page-cart">
+  <div class="cart-page">
+    <div class="cart-title">Your Cart 🛒</div>
+    <div id="cart-content"></div>
+  </div>
+</div>
+
+<!-- CHECKOUT -->
+<div class="page" id="page-checkout">
+  <div class="checkout-wrapper">
+    <div class="checkout-title">Checkout</div>
+    <div id="checkout-form">
+      <div class="checkout-section">
+        <h4>Delivery details</h4>
+        <div class="form-group"><label class="form-label">Full Name *</label><input class="form-input" id="c-name" placeholder="Ravi Sharma"></div>
+        <div class="form-group"><label class="form-label">Phone *</label><input class="form-input" id="c-phone" placeholder="+91 98765 43210"></div>
+        <div class="form-group"><label class="form-label">Address *</label><input class="form-input" id="c-addr" placeholder="Flat / House No, Street"></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">City</label><input class="form-input" id="c-city" placeholder="Pune"></div>
+          <div class="form-group"><label class="form-label">Pincode</label><input class="form-input" id="c-pin" placeholder="411001"></div>
+        </div>
+      </div>
+      <div class="checkout-section">
+        <h4>Payment method</h4>
+        <div class="radio-group">
+          <label><input type="radio" name="pay" value="upi" checked> UPI / GPay / PhonePe</label>
+          <label><input type="radio" name="pay" value="card"> Credit / Debit Card</label>
+          <label><input type="radio" name="pay" value="cod"> Cash on Delivery</label>
+        </div>
+      </div>
+      <div class="checkout-section" id="order-summary-section"></div>
+      <button class="checkout-btn-full" onclick="placeOrder()">Place Order →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div class="page" id="page-admin">
+  <div class="admin-page">
+    <div class="admin-header">
+      <div class="admin-title">🥭 Admin Dashboard</div>
+      <div style="font-size:13px;color:var(--soft)">MangoGrove Store Manager</div>
+    </div>
+    <div id="low-stock-alert"></div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-card-label">Total orders</div><div class="stat-card-val" id="s-orders">—</div><div class="stat-card-sub">All time</div></div>
+      <div class="stat-card"><div class="stat-card-label">Revenue</div><div class="stat-card-val" id="s-revenue">—</div><div class="stat-card-sub">Excl. cancelled</div></div>
+      <div class="stat-card"><div class="stat-card-label">Products</div><div class="stat-card-val" id="s-products">—</div><div class="stat-card-sub">In catalogue</div></div>
+      <div class="stat-card"><div class="stat-card-label">Avg. order</div><div class="stat-card-val" id="s-avg">—</div><div class="stat-card-sub">Per customer</div></div>
+    </div>
+    <div class="admin-tabs">
+      <button class="admin-tab active" onclick="adminTab('products',this)">Products</button>
+      <button class="admin-tab" onclick="adminTab('orders',this)">Orders</button>
+      <button class="admin-tab" onclick="adminTab('stock',this)">Stock Manager</button>
+    </div>
+
+    <!-- Products tab -->
+    <div id="atab-products" class="admin-panel">
+      <div class="admin-panel-header">
+        <div class="panel-title">Manage Products</div>
+        <button class="add-btn-admin" onclick="openProductModal()">+ Add Mango</button>
+      </div>
+      <table class="admin-table">
+        <thead><tr><th>Variety</th><th>Origin</th><th>Price</th><th>Stock</th><th>Type</th><th>Featured</th><th>Actions</th></tr></thead>
+        <tbody id="admin-product-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- Orders tab -->
+    <div id="atab-orders" class="admin-panel" style="display:none">
+      <div class="admin-panel-header"><div class="panel-title">All Orders</div><button class="btn-outline btn-sm" onclick="loadOrders()">↻ Refresh</button></div>
+      <div id="orders-container" style="padding:1rem"></div>
+    </div>
+
+    <!-- Stock tab -->
+    <div id="atab-stock" class="admin-panel" style="display:none">
+      <div class="admin-panel-header"><div class="panel-title">Stock Manager</div></div>
+      <div style="padding:1.5rem" id="stock-container"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="modal-overlay" id="product-modal">
+  <div class="modal">
+    <h3 id="modal-title">Add New Mango</h3>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Variety Name *</label><input class="form-input" id="p-name" placeholder="e.g. Alphonso"></div>
+      <div class="form-group"><label class="form-label">Emoji</label><input class="form-input" id="p-emoji" placeholder="🥭" value="🥭"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Price (₹/kg) *</label><input class="form-input" id="p-price" type="number" min="1" placeholder="450"></div>
+      <div class="form-group"><label class="form-label">Opening Stock (kg)</label><input class="form-input" id="p-stock" type="number" min="0" placeholder="50"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Origin / Region</label><input class="form-input" id="p-origin" placeholder="Ratnagiri, Maharashtra"></div>
+    <div class="form-group"><label class="form-label">Description</label><textarea class="form-input" id="p-desc" rows="3" placeholder="Rich, buttery, no-fibre…" style="resize:vertical"></textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Type</label>
+        <select class="form-input" id="p-type">
+          <option value="premium">Premium</option>
+          <option value="seasonal">Seasonal</option>
+          <option value="bulk">Bulk</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Featured on home?</label>
+        <select class="form-input" id="p-featured">
+          <option value="0">No</option>
+          <option value="1">Yes</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveProduct()">Save Product</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'http://localhost:5000/api';
+let allProducts = [];
+let cart = [];
+let editingProductId = null;
+let currentFilter = 'all';
+
+// ── API helpers ───────────────────────────────────────────────────────────────
+async function apiFetch(path, opts = {}) {
+  const res = await fetch(API + path, {
+    headers: { 'Content-Type': 'application/json' },
+    ...opts,
+    body: opts.body ? JSON.stringify(opts.body) : undefined,
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'API error');
+  return data;
+}
+
+// ── Page routing ──────────────────────────────────────────────────────────────
+function showPage(p) {
+  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-links a').forEach(el => el.classList.remove('active'));
+  document.getElementById('page-' + p).classList.add('active');
+  const navEl = document.getElementById('nav-' + p);
+  if (navEl) navEl.classList.add('active');
+  if (p === 'home')     loadHome();
+  if (p === 'shop')     loadShop();
+  if (p === 'cart')     renderCart();
+  if (p === 'admin')    loadAdmin();
+  if (p === 'checkout') renderOrderSummary();
+}
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+function toast(msg, color = '#2D6A35') {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.style.background = color;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2800);
+}
+
+// ── Product card renderer ─────────────────────────────────────────────────────
+function productCard(p) {
+  const outOfStock = p.stock <= 0;
+  const lowStock   = p.stock > 0 && p.stock < 20;
+  const tagClass   = p.type === 'premium' ? 'tag-fresh' : p.type === 'bulk' ? 'tag-bulk' : 'tag-seasonal';
+  const tagLabel   = p.type === 'premium' ? 'Premium' : p.type === 'bulk' ? 'Bulk Deal' : 'Seasonal';
+  const dotClass   = outOfStock ? 'out' : lowStock ? 'low' : '';
+  const stockLabel = outOfStock ? 'Out of stock' : lowStock ? `Only ${p.stock}kg left` : 'In stock';
+  return `
+    <div class="product-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <span class="tag ${tagClass}">${tagLabel}</span>
+        <div class="stock-indicator"><div class="stock-dot ${dotClass}"></div>${stockLabel}</div>
+      </div>
+      <div class="product-emoji">${p.emoji}</div>
+      <div>
+        <div class="product-name">${p.name}</div>
+        <div class="product-origin">📍 ${p.origin || '—'}</div>
+      </div>
+      <div class="product-desc">${p.description || ''}</div>
+      <div class="product-footer">
+        <div class="product-price">₹${p.price}<span>/kg</span></div>
+        <button class="add-btn" ${outOfStock ? 'disabled' : ''} onclick="addToCart(${p.id})">
+          ${outOfStock ? 'Sold out' : '+ Add'}
+        </button>
+      </div>
+    </div>`;
+}
+
+// ── HOME ──────────────────────────────────────────────────────────────────────
+async function loadHome() {
+  try {
+    const [products, stats] = await Promise.all([
+      apiFetch('/products'),
+      apiFetch('/stats'),
+    ]);
+    allProducts = products;
+    document.getElementById('home-varieties').textContent = stats.totalProducts + '+';
+    document.getElementById('home-orders').textContent    = stats.totalOrders + '+';
+    const featured = products.filter(p => p.featured);
+    const grid = document.getElementById('featured-grid');
+    grid.innerHTML = featured.length
+      ? featured.map(productCard).join('')
+      : '<p style="color:var(--soft)">No featured products yet. Mark some as featured in Admin.</p>';
+  } catch(e) {
+    document.getElementById('featured-grid').innerHTML = `<p style="color:#C62828">⚠️ Could not connect to server. Make sure <strong>server.js</strong> is running on port 5000.</p>`;
+  }
+}
+
+// ── SHOP ──────────────────────────────────────────────────────────────────────
+async function loadShop() {
+  const grid = document.getElementById('shop-grid');
+  grid.innerHTML = '<div class="loading">Loading mangoes…</div>';
+  try {
+    allProducts = await apiFetch('/products');
+    renderShopGrid();
+  } catch(e) {
+    grid.innerHTML = '<p style="color:#C62828">⚠️ Server not reachable.</p>';
+  }
+}
+
+function renderShopGrid() {
+  const filtered = currentFilter === 'all' ? allProducts : allProducts.filter(p => p.type === currentFilter);
+  const grid = document.getElementById('shop-grid');
+  grid.innerHTML = filtered.length ? filtered.map(productCard).join('') : '<p style="color:var(--soft);padding:2rem">No products in this category yet.</p>';
+}
+
+function filterShop(f, el) {
+  document.querySelectorAll('.filter-pills .pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  currentFilter = f;
+  renderShopGrid();
+}
+
+// ── CART ──────────────────────────────────────────────────────────────────────
+function addToCart(id) {
+  const p = allProducts.find(x => x.id === id);
+  if (!p || p.stock <= 0) return;
+  const existing = cart.find(x => x.id === id);
+  if (existing) {
+    if (existing.qty >= p.stock) { toast('No more stock available', '#E65100'); return; }
+    existing.qty++;
+  } else {
+    cart.push({ ...p, qty: 1 });
+  }
+  updateCartBadge();
+  toast(`${p.name} added to cart! 🥭`);
+}
+
+function updateCartBadge() {
+  document.getElementById('cart-count').textContent = cart.reduce((a, x) => a + x.qty, 0);
+}
+
+function renderCart() {
+  const el = document.getElementById('cart-content');
+  if (!cart.length) {
+    el.innerHTML = `<div class="empty-cart"><span class="empty-icon">🛒</span><p style="font-size:18px;font-weight:500;margin-bottom:8px">Your cart is empty</p><p style="font-size:14px;color:var(--soft)">Add some delicious mangoes!</p><button class="btn-primary" style="margin-top:1.5rem" onclick="showPage('shop')">Browse Mangoes →</button></div>`;
+    return;
+  }
+  const sub = cart.reduce((a, x) => a + x.price * x.qty, 0);
+  const del = sub >= 999 ? 0 : 99;
+  const total = sub + del;
+  el.innerHTML = cart.map(item => `
+    <div class="cart-item">
+      <div class="cart-item-emoji">${item.emoji}</div>
+      <div class="cart-item-info">
+        <div class="cart-item-name">${item.name}</div>
+        <div class="cart-item-price">₹${item.price}/kg</div>
+      </div>
+      <div class="qty-control">
+        <button class="qty-btn" onclick="changeQty(${item.id},-1)">−</button>
+        <span class="qty-num">${item.qty}</span>
+        <button class="qty-btn" onclick="changeQty(${item.id},1)">+</button>
+      </div>
+      <div class="cart-item-total">₹${item.price * item.qty}</div>
+      <button class="remove-btn" onclick="removeFromCart(${item.id})">🗑</button>
+    </div>`).join('') + `
+    <div class="cart-summary">
+      <div class="summary-row"><span>Subtotal</span><span>₹${sub}</span></div>
+      <div class="summary-row"><span>Delivery</span><span>${del === 0 ? '<span style="color:#2D6A35">FREE</span>' : '₹' + del}</span></div>
+      ${del > 0 ? `<div class="summary-row" style="color:var(--gold)"><span>Add ₹${999 - sub} more for free delivery</span></div>` : ''}
+      <div class="summary-total"><span style="font-size:15px;font-weight:500;color:var(--dark)">Total</span><span>₹${total}</span></div>
+      <button class="checkout-btn-full" onclick="showPage('checkout')">Proceed to Checkout →</button>
+    </div>`;
+}
+
+function changeQty(id, d) {
+  const item = cart.find(x => x.id === id);
+  const product = allProducts.find(x => x.id === id);
+  if (!item) return;
+  item.qty += d;
+  if (item.qty > (product ? product.stock : 9999)) { item.qty--; toast('No more stock available', '#E65100'); return; }
+  if (item.qty <= 0) cart = cart.filter(x => x.id !== id);
+  updateCartBadge();
+  renderCart();
+}
+
+function removeFromCart(id) {
+  cart = cart.filter(x => x.id !== id);
+  updateCartBadge();
+  renderCart();
+}
+
+// ── CHECKOUT ──────────────────────────────────────────────────────────────────
+function renderOrderSummary() {
+  const sub   = cart.reduce((a, x) => a + x.price * x.qty, 0);
+  const del   = sub >= 999 ? 0 : 99;
+  const total = sub + del;
+  document.getElementById('order-summary-section').innerHTML = `
+    <h4>Order summary</h4>
+    ${cart.map(i => `<div style="display:flex;justify-content:space-between;font-size:14px;color:var(--mid);margin-bottom:6px"><span>${i.emoji} ${i.name} × ${i.qty}kg</span><span>₹${i.price * i.qty}</span></div>`).join('')}
+    <div style="border-top:1px solid var(--border);margin-top:10px;padding-top:10px;display:flex;justify-content:space-between;font-weight:500">
+      <span>Total</span><span style="color:var(--gold);font-family:'Playfair Display',serif;font-size:18px">₹${total}</span>
+    </div>`;
+}
+
+async function placeOrder() {
+  const name  = document.getElementById('c-name').value.trim();
+  const phone = document.getElementById('c-phone').value.trim();
+  const addr  = document.getElementById('c-addr').value.trim();
+  const city  = document.getElementById('c-city').value.trim();
+  const pin   = document.getElementById('c-pin').value.trim();
+  const pay   = document.querySelector('input[name="pay"]:checked')?.value || 'upi';
+  if (!name || !phone || !addr) { toast('Please fill in Name, Phone and Address', '#C62828'); return; }
+  if (!cart.length) { toast('Your cart is empty!', '#C62828'); return; }
+
+  const sub   = cart.reduce((a, x) => a + x.price * x.qty, 0);
+  const del   = sub >= 999 ? 0 : 99;
+  const total = sub + del;
+
+  try {
+    const result = await apiFetch('/orders', {
+      method: 'POST',
+      body: {
+        customer_name: name, phone, address: addr, city, pincode: pin, payment: pay,
+        items: cart.map(i => ({ id: i.id, name: i.name, emoji: i.emoji, qty: i.qty, price: i.price })),
+        subtotal: sub, delivery: del, total,
+      },
+    });
+    cart = [];
+    updateCartBadge();
+    // Refresh product list so stock updates reflect
+    allProducts = await apiFetch('/products');
+    document.getElementById('checkout-form').innerHTML = `
+      <div class="success-msg">
+        <span class="success-icon">✅</span>
+        <div style="font-size:22px;font-weight:500;margin-bottom:8px">Order Placed Successfully!</div>
+        <div>Your mangoes are on their way. Expected delivery in 48 hours.</div>
+        <div style="font-size:13px;margin-top:10px;opacity:.8">Order ID: #MG-${String(result.id).padStart(4,'0')}</div>
+        <button class="btn-primary" style="margin-top:1.5rem" onclick="showPage('home')">Continue Shopping</button>
+      </div>`;
+  } catch(e) {
+    toast('Order failed: ' + e.message, '#C62828');
+  }
+}
+
+// ── ADMIN ─────────────────────────────────────────────────────────────────────
+async function loadAdmin() {
+  await Promise.all([loadStats(), loadAdminProducts()]);
+}
+
+async function loadStats() {
+  try {
+    const s = await apiFetch('/stats');
+    document.getElementById('s-orders').textContent   = s.totalOrders;
+    document.getElementById('s-revenue').textContent  = '₹' + s.totalRevenue.toLocaleString('en-IN');
+    document.getElementById('s-products').textContent = s.totalProducts;
+    document.getElementById('s-avg').textContent      = '₹' + s.avgOrder.toLocaleString('en-IN');
+    const alertBox = document.getElementById('low-stock-alert');
+    if (s.lowStock && s.lowStock.length > 0) {
+      alertBox.innerHTML = `<div class="alert-box">⚠️ <strong>Low stock:</strong> ${s.lowStock.map(p => `${p.name} (${p.stock}kg)`).join(', ')}</div>`;
+    } else {
+      alertBox.innerHTML = '';
+    }
+  } catch(e) { console.error('Stats error', e); }
+}
+
+async function loadAdminProducts() {
+  try {
+    allProducts = await apiFetch('/products');
+    const tbody = document.getElementById('admin-product-tbody');
+    tbody.innerHTML = allProducts.map(p => `
+      <tr>
+        <td>${p.emoji} <strong>${p.name}</strong></td>
+        <td style="font-size:13px;color:var(--soft)">${p.origin || '—'}</td>
+        <td style="font-weight:500">₹${p.price}/kg</td>
+        <td><span class="tag ${p.stock < 20 ? 'tag-seasonal' : 'tag-fresh'}">${p.stock} kg</span></td>
+        <td><span class="tag ${p.type === 'premium' ? 'tag-fresh' : p.type === 'bulk' ? 'tag-bulk' : 'tag-seasonal'}">${p.type}</span></td>
+        <td>${p.featured ? '⭐ Yes' : 'No'}</td>
+        <td>
+          <button class="edit-btn" onclick="openEditModal(${p.id})">Edit</button>
+          <button class="del-btn" onclick="deleteProduct(${p.id})">Delete</button>
+        </td>
+      </tr>`).join('');
+  } catch(e) {
+    document.getElementById('admin-product-tbody').innerHTML = `<tr><td colspan="7" style="color:#C62828;padding:1rem">Could not load products.</td></tr>`;
+  }
+}
+
+async function loadOrders() {
+  const container = document.getElementById('orders-container');
+  container.innerHTML = '<div class="loading">Loading orders…</div>';
+  try {
+    const orders = await apiFetch('/orders');
+    if (!orders.length) { container.innerHTML = '<p style="color:var(--soft);padding:1rem">No orders yet.</p>'; return; }
+    container.innerHTML = orders.map(o => `
+      <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:1.2rem 1.5rem;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+        <div>
+          <div style="font-size:12px;color:var(--soft)">#MG-${String(o.id).padStart(4,'0')} · ${new Date(o.created_at).toLocaleDateString('en-IN')}</div>
+          <div style="font-weight:500;font-size:15px;margin:2px 0">${o.customer_name}</div>
+          <div style="font-size:13px;color:var(--mid)">${o.items.map(i => `${i.emoji} ${i.name} ×${i.qty}kg`).join(', ')}</div>
+          <div style="font-size:12px;color:var(--soft);margin-top:2px">📞 ${o.phone} · ${o.city || o.address}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:1rem">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--gold);font-weight:700">₹${o.total}</div>
+          <select class="order-status-select" onchange="updateOrderStatus(${o.id},this.value)">
+            ${['preparing','shipped','delivered','cancelled'].map(s => `<option value="${s}" ${o.status===s?'selected':''}>${s.charAt(0).toUpperCase()+s.slice(1)}</option>`).join('')}
+          </select>
+        </div>
+      </div>`).join('');
+  } catch(e) {
+    container.innerHTML = '<p style="color:#C62828">Could not load orders.</p>';
+  }
+}
+
+async function updateOrderStatus(id, status) {
+  try {
+    await apiFetch(`/orders/${id}/status`, { method: 'PATCH', body: { status } });
+    toast(`Order #MG-${String(id).padStart(4,'0')} → ${status}`);
+    loadStats();
+  } catch(e) {
+    toast('Failed to update status', '#C62828');
+  }
+}
+
+async function loadStockManager() {
+  const container = document.getElementById('stock-container');
+  container.innerHTML = '<div class="loading">Loading…</div>';
+  try {
+    allProducts = await apiFetch('/products');
+    container.innerHTML = `
+      <p style="font-size:13px;color:var(--soft);margin-bottom:1.5rem">Adjust stock levels for each variety. Use positive numbers to add stock, negative to remove.</p>
+      ${allProducts.map(p => `
+        <div style="display:flex;align-items:center;gap:1rem;padding:.75rem 0;border-bottom:1px solid var(--border);flex-wrap:wrap">
+          <div style="flex:1;min-width:200px">
+            <div style="font-weight:500">${p.emoji} ${p.name}</div>
+            <div style="font-size:12px;color:var(--soft)">Current stock: <strong style="color:${p.stock<20?'#E65100':'#2D6A35'}">${p.stock} kg</strong></div>
+          </div>
+          <input type="number" id="stock-change-${p.id}" placeholder="e.g. +50 or -10" class="form-input" style="width:160px">
+          <input type="text" id="stock-reason-${p.id}" placeholder="Reason (optional)" class="form-input" style="width:180px">
+          <button class="btn-primary btn-sm" onclick="updateStock(${p.id})">Update</button>
+        </div>`).join('')}`;
+  } catch(e) {
+    container.innerHTML = '<p style="color:#C62828">Could not load products.</p>';
+  }
+}
+
+async function updateStock(id) {
+  const change = parseInt(document.getElementById(`stock-change-${id}`).value);
+  const reason = document.getElementById(`stock-reason-${id}`).value;
+  if (isNaN(change) || change === 0) { toast('Enter a valid stock change number', '#E65100'); return; }
+  try {
+    const result = await apiFetch(`/products/${id}/stock`, { method: 'PATCH', body: { change, reason } });
+    toast(`Stock updated → ${result.newStock} kg`);
+    loadStockManager();
+    loadStats();
+  } catch(e) {
+    toast('Error: ' + e.message, '#C62828');
+  }
+}
+
+function adminTab(tab, el) {
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('atab-products').style.display = tab === 'products' ? 'block' : 'none';
+  document.getElementById('atab-orders').style.display   = tab === 'orders'   ? 'block' : 'none';
+  document.getElementById('atab-stock').style.display    = tab === 'stock'    ? 'block' : 'none';
+  if (tab === 'products') loadAdminProducts();
+  if (tab === 'orders')   loadOrders();
+  if (tab === 'stock')    loadStockManager();
+}
+
+// ── PRODUCT MODAL ─────────────────────────────────────────────────────────────
+function openProductModal() {
+  editingProductId = null;
+  document.getElementById('modal-title').textContent = 'Add New Mango';
+  document.getElementById('p-name').value     = '';
+  document.getElementById('p-emoji').value    = '🥭';
+  document.getElementById('p-price').value    = '';
+  document.getElementById('p-stock').value    = '';
+  document.getElementById('p-origin').value   = '';
+  document.getElementById('p-desc').value     = '';
+  document.getElementById('p-type').value     = 'seasonal';
+  document.getElementById('p-featured').value = '0';
+  document.getElementById('product-modal').classList.add('open');
+}
+
+function openEditModal(id) {
+  const p = allProducts.find(x => x.id === id);
+  if (!p) return;
+  editingProductId = id;
+  document.getElementById('modal-title').textContent = 'Edit ' + p.name;
+  document.getElementById('p-name').value     = p.name;
+  document.getElementById('p-emoji').value    = p.emoji;
+  document.getElementById('p-price').value    = p.price;
+  document.getElementById('p-stock').value    = p.stock;
+  document.getElementById('p-origin').value   = p.origin || '';
+  document.getElementById('p-desc').value     = p.description || '';
+  document.getElementById('p-type').value     = p.type;
+  document.getElementById('p-featured').value = p.featured ? '1' : '0';
+  document.getElementById('product-modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('product-modal').classList.remove('open');
+}
+
+async function saveProduct() {
+  const payload = {
+    name:        document.getElementById('p-name').value.trim(),
+    emoji:       document.getElementById('p-emoji').value.trim() || '🥭',
+    price:       parseInt(document.getElementById('p-price').value),
+    stock:       parseInt(document.getElementById('p-stock').value) || 0,
+    origin:      document.getElementById('p-origin').value.trim(),
+    description: document.getElementById('p-desc').value.trim(),
+    type:        document.getElementById('p-type').value,
+    featured:    parseInt(document.getElementById('p-featured').value),
+  };
+  if (!payload.name || !payload.price) { toast('Name and price are required', '#C62828'); return; }
+  try {
+    if (editingProductId) {
+      await apiFetch(`/products/${editingProductId}`, { method: 'PUT', body: payload });
+      toast('Product updated ✅');
+    } else {
+      await apiFetch('/products', { method: 'POST', body: payload });
+      toast('Product added ✅');
+    }
+    closeModal();
+    loadAdminProducts();
+    loadStats();
+  } catch(e) {
+    toast('Error: ' + e.message, '#C62828');
+  }
+}
+
+async function deleteProduct(id) {
+  const p = allProducts.find(x => x.id === id);
+  if (!confirm(`Delete "${p?.name}"? This cannot be undone.`)) return;
+  try {
+    await apiFetch(`/products/${id}`, { method: 'DELETE' });
+    toast('Product deleted');
+    loadAdminProducts();
+    loadStats();
+  } catch(e) {
+    toast('Error: ' + e.message, '#C62828');
+  }
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+loadHome();
+</script>
+</body>
+</html>

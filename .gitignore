@@ -1,0 +1,4 @@
+node_modules/
+mangoes.db
+*.db
+npm-debug.log
