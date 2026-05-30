@@ -1,0 +1,12 @@
+{
+  "agents": [
+    { "id": "agent-1", "url": "http://localhost:3001/report" },
+    { "id": "agent-2", "url": "http://localhost:3002/report" },
+    { "id": "agent-3", "url": "http://localhost:3003/report" },
+    { "id": "agent-4", "url": "http://localhost:3004/report" },
+    { "id": "agent-5", "url": "http://localhost:3005/report" },
+    { "id": "agent-6", "url": "http://localhost:3006/report" },
+    { "id": "agent-7", "url": "http://localhost:3007/report" },
+    { "id": "agent-8", "url": "http://localhost:3008/report" }
+  ]
+}

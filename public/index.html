@@ -201,7 +201,9 @@ footer a{color:var(--gold)}
     <a onclick="showPage('home')" id="nav-home" class="active">Home</a>
     <a onclick="showPage('shop')" id="nav-shop">Shop</a>
     <a onclick="showPage('about')" id="nav-about">About</a>
-    <a onclick="showPage('admin')" id="nav-admin">Admin ⚙️</a>
+    <a onclick="showPage('admin')" id="nav-admin" style="display:none">Admin ⚙️</a>
+    <a onclick="showPage('profile')" id="nav-profile" style="display:none">Profile</a>
+    <a onclick="handleAuthNav()" id="nav-auth">Login</a>
   </div>
   <button class="cart-btn" onclick="showPage('cart')">🛒 Cart <span class="cart-badge" id="cart-count">0</span></button>
 </nav>
@@ -261,6 +263,7 @@ footer a{color:var(--gold)}
       <span class="pill" onclick="filterShop('premium',this)">Premium</span>
       <span class="pill" onclick="filterShop('seasonal',this)">Seasonal</span>
       <span class="pill" onclick="filterShop('bulk',this)">Bulk Deals</span>
+      <span class="pill" onclick="filterShop('favorites',this)">Favorites ❤</span>
     </div>
     <div class="product-grid" id="shop-grid"><div class="loading">Loading mangoes…</div></div>
   </div>
@@ -289,6 +292,88 @@ footer a{color:var(--gold)}
   </div>
 </div>
 
+<!-- AUTH -->
+<div class="page" id="page-auth">
+  <div class="checkout-wrapper">
+    <div class="checkout-title" id="auth-title">Login to MangoGrove</div>
+    <div style="display:flex;gap:10px;margin:1rem 0;flex-wrap:wrap">
+      <button class="btn-outline" id="auth-login-button" onclick="setAuthMode('login')">Login</button>
+      <button class="btn-outline" id="auth-register-button" onclick="setAuthMode('register')">Register</button>
+    </div>
+    <div class="checkout-section">
+      <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="auth-email" type="email" placeholder="you@example.com"></div>
+      <div class="form-group" id="auth-first-name-group" style="display:none"><label class="form-label">First name</label><input class="form-input" id="auth-first-name" type="text" placeholder="Ravi"></div>
+      <div class="form-group" id="auth-last-name-group" style="display:none"><label class="form-label">Last name</label><input class="form-input" id="auth-last-name" type="text" placeholder="Sharma"></div>
+      <div class="form-row" id="auth-personal-row" style="display:none">
+        <div class="form-group"><label class="form-label">Age</label><input class="form-input" id="auth-age" type="number" min="1" placeholder="28"></div>
+        <div class="form-group"><label class="form-label">Gender</label>
+          <select class="form-input" id="auth-gender">
+            <option value="">Prefer not to say</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Password</label><input class="form-input" id="auth-password" type="password" placeholder="••••••••"></div>
+      <div class="form-group" id="auth-confirm-group" style="display:none"><label class="form-label">Confirm password</label><input class="form-input" id="auth-confirm-password" type="password" placeholder="••••••••"></div>
+      <div class="form-group" id="auth-code-group" style="display:none"><label class="form-label">Verification / reset code</label><input class="form-input" id="auth-code" type="text" placeholder="123456"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:.75rem;font-size:13px;color:var(--soft)">
+        <button class="btn-outline btn-sm" type="button" onclick="setAuthMode('forgot')" id="auth-forgot-link">Forgot password?</button>
+        <button class="btn-outline btn-sm" type="button" onclick="resendVerification()" id="auth-resend-link" style="display:none">Resend code</button>
+      </div>
+    </div>
+    <button class="checkout-btn-full" onclick="submitAuth()"><span id="auth-submit-label">Login</span></button>
+    <p id="auth-note" style="margin-top:1rem;font-size:13px;color:var(--soft)">Create an account with any email address and a password you choose.</p>
+  </div>
+</div>
+
+<!-- PROFILE -->
+<div class="page" id="page-profile">
+  <div class="checkout-wrapper">
+    <div class="checkout-title">Your Profile</div>
+    <div class="checkout-section">
+      <h4>Account</h4>
+      <div class="form-group"><label class="form-label">Email</label><div id="profile-email" style="padding:10px 14px;background:var(--cream);border-radius:10px;color:var(--mid)"></div></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">First name</label><input class="form-input" id="profile-first" placeholder="Ravi"></div>
+        <div class="form-group"><label class="form-label">Last name</label><input class="form-input" id="profile-last" placeholder="Sharma"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Age</label><input class="form-input" id="profile-age" type="number" min="1" placeholder="28"></div>
+        <div class="form-group"><label class="form-label">Gender</label>
+          <select class="form-input" id="profile-gender"><option value="">Prefer not to say</option><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option></select>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:1rem">
+        <button class="btn-outline" onclick="loadProfilePage()">Reload</button>
+        <button class="btn-primary" onclick="saveProfile()">Save Profile</button>
+      </div>
+    </div>
+
+    <div class="checkout-section">
+      <h4>Saved addresses</h4>
+      <div id="profile-addresses"></div>
+      <div style="margin-top:1rem;border-top:1px solid var(--border);padding-top:12px">
+        <div style="font-size:13px;color:var(--soft);margin-bottom:.5rem">Add new address</div>
+        <div class="form-group"><label class="form-label">Label (optional)</label><input class="form-input" id="addr-label" placeholder="Home, Office"></div>
+        <div class="form-group"><label class="form-label">Full name</label><input class="form-input" id="addr-full" placeholder="Ravi Sharma"></div>
+        <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="addr-phone" placeholder="+91 98765 43210"></div>
+        <div class="form-group"><label class="form-label">Address line 1</label><input class="form-input" id="addr-line1" placeholder="Flat / House No, Street"></div>
+        <div class="form-group"><label class="form-label">Address line 2</label><input class="form-input" id="addr-line2" placeholder="Area / Landmark (optional)"></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">City</label><input class="form-input" id="addr-city" placeholder="Pune"></div>
+          <div class="form-group"><label class="form-label">Pincode</label><input class="form-input" id="addr-pin" placeholder="411001"></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:0.75rem">
+          <input type="checkbox" id="addr-default"><label for="addr-default" style="font-size:13px;color:var(--mid)">Set as default</label>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="btn-primary" onclick="addProfileAddress()">Add address</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- CHECKOUT -->
 <div class="page" id="page-checkout">
   <div class="checkout-wrapper">
@@ -296,6 +381,11 @@ footer a{color:var(--gold)}
     <div id="checkout-form">
       <div class="checkout-section">
         <h4>Delivery details</h4>
+        <div class="form-group" id="checkout-addresses-group" style="display:none"><label class="form-label">Saved addresses</label>
+          <select class="form-input" id="saved-address-select" onchange="onCheckoutAddressChange()">
+            <option value="">Use a new address</option>
+          </select>
+        </div>
         <div class="form-group"><label class="form-label">Full Name *</label><input class="form-input" id="c-name" placeholder="Ravi Sharma"></div>
         <div class="form-group"><label class="form-label">Phone *</label><input class="form-input" id="c-phone" placeholder="+91 98765 43210"></div>
         <div class="form-group"><label class="form-label">Address *</label><input class="form-input" id="c-addr" placeholder="Flat / House No, Street"></div>
@@ -303,13 +393,17 @@ footer a{color:var(--gold)}
           <div class="form-group"><label class="form-label">City</label><input class="form-input" id="c-city" placeholder="Pune"></div>
           <div class="form-group"><label class="form-label">Pincode</label><input class="form-input" id="c-pin" placeholder="411001"></div>
         </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:1rem;display:none" id="checkout-save-address-row">
+          <input type="checkbox" id="checkout-save-address">
+          <label for="checkout-save-address" style="font-size:13px;color:var(--mid);">Save this address for future orders</label>
+        </div>
       </div>
       <div class="checkout-section">
         <h4>Payment method</h4>
-        <div class="radio-group">
-          <label><input type="radio" name="pay" value="upi" checked> UPI / GPay / PhonePe</label>
-          <label><input type="radio" name="pay" value="card"> Credit / Debit Card</label>
-          <label><input type="radio" name="pay" value="cod"> Cash on Delivery</label>
+        <div id="payment-methods-list" class="radio-group"><div class="loading">Loading payment methods…</div></div>
+        <div id="upi-info" style="margin-top:1rem;font-size:14px;color:var(--mid);display:none">
+          <div>Pay using UPI ID <strong id="upi-id-label"></strong></div>
+          <img id="upi-qr-preview" style="max-width:160px;margin-top:0.75rem;display:none;border-radius:12px;border:1px solid var(--border)" alt="UPI QR code">
         </div>
       </div>
       <div class="checkout-section" id="order-summary-section"></div>
@@ -335,7 +429,10 @@ footer a{color:var(--gold)}
     <div class="admin-tabs">
       <button class="admin-tab active" onclick="adminTab('products',this)">Products</button>
       <button class="admin-tab" onclick="adminTab('orders',this)">Orders</button>
+      <button class="admin-tab" onclick="adminTab('users',this)">Users</button>
       <button class="admin-tab" onclick="adminTab('stock',this)">Stock Manager</button>
+      <button class="admin-tab" onclick="adminTab('reports',this)">Reports</button>
+      <button class="admin-tab" onclick="adminTab('settings',this)">Settings</button>
     </div>
 
     <!-- Products tab -->
@@ -356,10 +453,45 @@ footer a{color:var(--gold)}
       <div id="orders-container" style="padding:1rem"></div>
     </div>
 
+    <!-- Users tab -->
+    <div id="atab-users" class="admin-panel" style="display:none">
+      <div class="admin-panel-header"><div class="panel-title">Admin Users</div><button class="btn-outline btn-sm" onclick="loadAdminUsers()">↻ Refresh</button></div>
+      <table class="admin-table">
+        <thead><tr><th>ID</th><th>Email</th><th>Role</th><th>Created</th><th>Status</th><th>Reason</th><th>Actions</th></tr></thead>
+        <tbody id="admin-users-tbody"></tbody>
+      </table>
+    </div>
+
     <!-- Stock tab -->
     <div id="atab-stock" class="admin-panel" style="display:none">
       <div class="admin-panel-header"><div class="panel-title">Stock Manager</div></div>
       <div style="padding:1.5rem" id="stock-container"></div>
+    </div>
+
+    <!-- Reports tab -->
+    <div id="atab-reports" class="admin-panel" style="display:none">
+      <div class="admin-panel-header"><div class="panel-title">Reports & Accounting</div><button class="btn-outline btn-sm" onclick="loadReports()">↻ Refresh</button></div>
+      <div id="reports-container" style="padding:1.5rem"></div>
+    </div>
+
+    <!-- Settings tab -->
+    <div id="atab-settings" class="admin-panel" style="display:none">
+      <div class="admin-panel-header"><div class="panel-title">UPI / Payment Settings</div></div>
+      <div style="padding:1.5rem">
+        <div class="form-group"><label class="form-label">UPI ID</label><input class="form-input" id="setting-upi-id" placeholder="mango@bank"></div>
+        <div class="form-group"><label class="form-label">UPI QR Code URL</label><input class="form-input" id="setting-upi-qr" placeholder="https://..." onchange="renderUpiPreview()"></div>
+        <div class="form-group"><label class="form-label">Upload UPI QR Image</label><input class="form-input" id="setting-upi-upload" type="file" accept="image/png,image/jpeg,image/webp" onchange="handleUpiQrUpload(event)"></div>
+        <div id="setting-upi-upload-note" style="font-size:13px;color:var(--soft);margin-bottom:0.75rem">Choose a PNG/JPG/WebP file to upload.</div>
+        <div id="upi-preview-container" style="margin-top:1rem;display:none">
+          <div style="font-size:13px;color:var(--soft);margin-bottom:0.5rem">QR preview</div>
+          <img id="upi-preview" style="max-width:240px;border-radius:14px;border:1px solid var(--border);" alt="UPI QR preview">
+        </div>
+        <div style="margin-top:1rem"><button class="btn-primary" onclick="savePaymentSettings()">Save Payment Settings</button></div>
+        <div style="margin-top:1.5rem">
+          <h4 style="margin:0.75rem 0">Payment methods</h4>
+          <div id="admin-payment-methods-list" style="display:flex;flex-direction:column;gap:8px"></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -371,6 +503,13 @@ footer a{color:var(--gold)}
     <div class="form-row">
       <div class="form-group"><label class="form-label">Variety Name *</label><input class="form-input" id="p-name" placeholder="e.g. Alphonso"></div>
       <div class="form-group"><label class="form-label">Emoji</label><input class="form-input" id="p-emoji" placeholder="🥭" value="🥭"></div>
+      <div class="form-group"><label class="form-label">Image (optional)</label>
+        <input class="form-input" id="p-image" type="file" accept="image/png,image/jpeg,image/webp" onchange="handleProductImageSelect(event)">
+        <div id="p-image-preview-container" style="margin-top:8px;display:none">
+          <img id="p-image-preview" style="max-width:160px;border-radius:10px;border:1px solid var(--border);display:block">
+          <div style="margin-top:6px"><button class="btn-outline btn-sm" onclick="removeSelectedProductImage()">Remove</button></div>
+        </div>
+      </div>
     </div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">Price (₹/kg) *</label><input class="form-input" id="p-price" type="number" min="1" placeholder="450"></div>
@@ -400,37 +539,606 @@ footer a{color:var(--gold)}
   </div>
 </div>
 
+<!-- COD LIMIT MODAL -->
+<div class="modal-overlay" id="cod-modal">
+  <div class="modal">
+    <h3>Cash on Delivery temporarily disabled</h3>
+    <div id="cod-modal-msg" style="font-size:14px;color:var(--mid);margin-top:6px">You have too many active COD orders.</div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeCodModal()">Close</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const API = '/api';
 let allProducts = [];
 let cart = [];
 let editingProductId = null;
 let currentFilter = 'all';
+let authToken = localStorage.getItem('mg_token') || '';
+let currentUser = null;
+let favorites = [];
+let favoritesSet = new Set();
+let currentAddresses = [];
+let paymentSettings = { upi_id: '', upi_qr: '' };
+let upiQrFile = null;
+let authMode = 'login';
 
 // ── API helpers ───────────────────────────────────────────────────────────────
 async function apiFetch(path, opts = {}) {
+  const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
+  if (authToken) headers.Authorization = `Bearer ${authToken}`;
   const res = await fetch(API + path, {
-    headers: { 'Content-Type': 'application/json' },
     ...opts,
+    headers,
     body: opts.body ? JSON.stringify(opts.body) : undefined,
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'API error');
+  if (!res.ok) {
+    const err = new Error(data.message || data.error || 'API error');
+    err.code = data.error || data.code;
+    throw err;
+  }
   return data;
 }
 
+function setAuthMode(mode) {
+  authMode = mode;
+  const title = document.getElementById('auth-title');
+  const submitLabel = document.getElementById('auth-submit-label');
+  const firstNameGroup = document.getElementById('auth-first-name-group');
+  const lastNameGroup = document.getElementById('auth-last-name-group');
+  const personalRow = document.getElementById('auth-personal-row');
+  const confirmGroup = document.getElementById('auth-confirm-group');
+  const codeGroup = document.getElementById('auth-code-group');
+  const forgotLink = document.getElementById('auth-forgot-link');
+  const resendLink = document.getElementById('auth-resend-link');
+  const note = document.getElementById('auth-note');
+
+  firstNameGroup.style.display = mode === 'register' ? 'block' : 'none';
+  lastNameGroup.style.display = mode === 'register' ? 'block' : 'none';
+  personalRow.style.display = mode === 'register' ? 'grid' : 'none';
+  confirmGroup.style.display = mode === 'register' || mode === 'reset' ? 'block' : 'none';
+  codeGroup.style.display = mode === 'verify' || mode === 'reset' ? 'block' : 'none';
+  forgotLink.style.display = mode === 'login' ? 'inline-flex' : 'none';
+  resendLink.style.display = mode === 'verify' ? 'inline-flex' : 'none';
+
+  if (mode === 'login') {
+    title.textContent = 'Login to MangoGrove';
+    submitLabel.textContent = 'Login';
+    note.textContent = 'Create an account with any email address and a password you choose.';
+  } else if (mode === 'register') {
+    title.textContent = 'Register a new account';
+    submitLabel.textContent = 'Register';
+    note.textContent = 'We will send a verification code to your email after registration.';
+  } else if (mode === 'forgot') {
+    title.textContent = 'Forgot Password';
+    submitLabel.textContent = 'Send reset code';
+    note.textContent = 'Enter your email and we will send a reset code to your inbox.';
+  } else if (mode === 'verify') {
+    title.textContent = 'Verify your email';
+    submitLabel.textContent = 'Verify Email';
+    note.textContent = 'Enter the code sent to your email to activate your account.';
+  } else if (mode === 'reset') {
+    title.textContent = 'Reset Password';
+    submitLabel.textContent = 'Reset Password';
+    note.textContent = 'Enter the code from email and choose a new password.';
+  }
+}
+
+function updateAuthUI() {
+  const authLink = document.getElementById('nav-auth');
+  const adminLink = document.getElementById('nav-admin');
+  if (currentUser) {
+    authLink.textContent = `Logout (${currentUser.email})`;
+    adminLink.style.display = currentUser.role === 'admin' ? 'inline-flex' : 'none';
+    const profileLink = document.getElementById('nav-profile');
+    if (profileLink) profileLink.style.display = 'inline-flex';
+  } else {
+    authLink.textContent = 'Login';
+    adminLink.style.display = 'none';
+    const profileLink = document.getElementById('nav-profile');
+    if (profileLink) profileLink.style.display = 'none';
+  }
+}
+
+function handleAuthNav() {
+  if (currentUser) return logout();
+  setAuthMode('login');
+  showPage('auth');
+}
+
+async function submitAuth() {
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const confirmPassword = document.getElementById('auth-confirm-password').value;
+  const firstName = document.getElementById('auth-first-name').value.trim();
+  const lastName = document.getElementById('auth-last-name').value.trim();
+  const age = document.getElementById('auth-age').value;
+  const gender = document.getElementById('auth-gender').value;
+  const code = document.getElementById('auth-code').value.trim();
+
+  if (!email) { toast('Email is required', '#C62828'); return; }
+  if (authMode === 'login' && !password) { toast('Password is required', '#C62828'); return; }
+  if (authMode === 'register') {
+    if (!password || !firstName || !lastName) { toast('Please fill in all required fields', '#C62828'); return; }
+    if (password !== confirmPassword) { toast('Passwords do not match', '#C62828'); return; }
+  }
+  if (authMode === 'reset') {
+    if (!code || !password || !confirmPassword) { toast('Please fill in the reset code and new password', '#C62828'); return; }
+    if (password !== confirmPassword) { toast('Passwords do not match', '#C62828'); return; }
+  }
+
+  try {
+    let result;
+    if (authMode === 'login') {
+      result = await apiFetch('/auth/login', { method: 'POST', body: { email, password } });
+    } else if (authMode === 'register') {
+      result = await apiFetch('/auth/register', { method: 'POST', body: { email, password, first_name: firstName, last_name: lastName, age, gender } });
+      toast(result.message || 'Registration successful. Verification code sent.', '#2D6A35');
+      setAuthMode('verify');
+      return;
+    } else if (authMode === 'forgot') {
+      result = await apiFetch('/auth/forgot-password', { method: 'POST', body: { email } });
+      toast(result.message || 'Reset code sent to email', '#2D6A35');
+      setAuthMode('reset');
+      return;
+    } else if (authMode === 'verify') {
+      result = await apiFetch('/auth/verify-email', { method: 'POST', body: { email, otp: code } });
+      authToken = result.token;
+      currentUser = result.user;
+      localStorage.setItem('mg_token', authToken);
+      updateAuthUI();
+      toast('Email verified successfully');
+      showPage('home');
+      return;
+    } else if (authMode === 'reset') {
+      result = await apiFetch('/auth/reset-password', { method: 'POST', body: { email, otp: code, password } });
+      toast(result.message || 'Password reset successfully', '#2D6A35');
+      setAuthMode('login');
+      return;
+    }
+
+    authToken = result.token;
+    currentUser = result.user;
+    localStorage.setItem('mg_token', authToken);
+    updateAuthUI();
+    toast(authMode === 'login' ? 'Logged in successfully' : 'Authenticated successfully');
+    showPage('home');
+  } catch (e) {
+    if (e.message.includes('not verified')) {
+      toast('Your email is not verified. Please verify to continue.', '#E65100');
+      setAuthMode('verify');
+      return;
+    }
+    toast(e.message, '#C62828');
+  }
+}
+
+async function resendVerification() {
+  const email = document.getElementById('auth-email').value.trim();
+  if (!email) { toast('Enter the email to resend code', '#C62828'); return; }
+  try {
+    const result = await apiFetch('/auth/resend-verification', { method: 'POST', body: { email } });
+    toast(result.message || 'Verification code resent', '#2D6A35');
+  } catch (e) {
+    toast(e.message, '#C62828');
+  }
+}
+
+async function loadCurrentUser() {
+  if (!authToken) return updateAuthUI();
+  try {
+    currentUser = await apiFetch('/auth/me');
+  } catch (_) {
+    authToken = '';
+    localStorage.removeItem('mg_token');
+    currentUser = null;
+  }
+  updateAuthUI();
+}
+
+async function loadFavorites() {
+  if (!currentUser) {
+    favorites = [];
+    favoritesSet = new Set();
+    return;
+  }
+  try {
+    favorites = await apiFetch('/users/me/favorites');
+    favoritesSet = new Set((favorites || []).map(f => f.id));
+  } catch (e) {
+    console.warn('Could not load favorites', e);
+    favorites = [];
+    favoritesSet = new Set();
+  }
+}
+
+async function toggleFavorite(productId) {
+  if (!currentUser) { toast('Please login to save favorites', '#E65100'); return; }
+  const isFav = favoritesSet.has(productId);
+  try {
+    if (isFav) {
+      await apiFetch(`/users/me/favorites/${productId}`, { method: 'DELETE' });
+    } else {
+      await apiFetch('/users/me/favorites', { method: 'POST', body: { product_id: productId } });
+    }
+    await loadFavorites();
+    // refresh visible lists
+    try { renderShopGrid(); } catch(_) {}
+    try { loadHome(); } catch(_) {}
+  } catch (e) {
+    toast('Failed to update favorites', '#C62828');
+  }
+}
+
+async function loadCheckoutAddresses() {
+  if (!currentUser) return;
+  try {
+    currentAddresses = await apiFetch('/users/addresses');
+    const select = document.getElementById('saved-address-select');
+    const group = document.getElementById('checkout-addresses-group');
+    const saveRow = document.getElementById('checkout-save-address-row');
+    if (!select || !group || !saveRow) return;
+    if (currentAddresses.length === 0) {
+      group.style.display = 'none';
+      saveRow.style.display = 'flex';
+      document.getElementById('saved-address-select').innerHTML = '<option value="">Use a new address</option>';
+      return;
+    }
+    select.innerHTML = `<option value="">Use a new address</option>${currentAddresses.map(a => `<option value="${a.id}">${a.label || a.full_name + ' · ' + a.line1 + (a.line2 ? ', ' + a.line2 : '')}</option>`).join('')}`;
+    group.style.display = 'block';
+    saveRow.style.display = 'flex';
+  } catch (e) {
+    console.warn('Unable to load addresses', e);
+  }
+}
+
+async function loadProfilePage() {
+  try {
+    const user = await apiFetch('/auth/me');
+    document.getElementById('profile-email').textContent = user.email || '';
+    document.getElementById('profile-first').value = user.first_name || '';
+    document.getElementById('profile-last').value = user.last_name || '';
+    document.getElementById('profile-age').value = user.age || '';
+    document.getElementById('profile-gender').value = user.gender || '';
+    currentAddresses = await apiFetch('/users/addresses');
+    renderProfileAddresses();
+  } catch (e) {
+    toast('Could not load profile', '#C62828');
+  }
+}
+
+async function saveProfile() {
+  const first_name = document.getElementById('profile-first').value.trim();
+  const last_name = document.getElementById('profile-last').value.trim();
+  const age = document.getElementById('profile-age').value;
+  const gender = document.getElementById('profile-gender').value;
+  try {
+    const updated = await apiFetch('/auth/me', { method: 'PUT', body: { first_name, last_name, age, gender } });
+    currentUser = updated;
+    toast('Profile saved');
+    updateAuthUI();
+  } catch (e) {
+    toast('Save failed: ' + e.message, '#C62828');
+  }
+}
+
+function renderProfileAddresses() {
+  const el = document.getElementById('profile-addresses');
+  if (!el) return;
+  if (!currentAddresses || currentAddresses.length === 0) {
+    el.innerHTML = '<p style="color:var(--soft)">No saved addresses yet.</p>';
+    return;
+  }
+  el.innerHTML = currentAddresses.map(a => `
+    <div style="display:flex;justify-content:space-between;align-items:center;border:1px solid var(--border);padding:10px;border-radius:10px;margin-bottom:8px">
+      <div style="flex:1">
+        <div style="font-weight:500">${a.label || a.full_name}</div>
+        <div style="font-size:13px;color:var(--mid)">${a.line1}${a.line2 ? ', ' + a.line2 : ''} · ${a.city} · ${a.pincode}</div>
+        <div style="font-size:12px;color:var(--soft);margin-top:6px">📞 ${a.phone} ${a.is_default ? ' · Default' : ''}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-left:12px">
+        ${a.is_default ? '<button class="btn-outline btn-sm" disabled>Default</button>' : `<button class="btn-primary btn-sm" onclick="setDefaultAddress(${a.id})">Set Default</button>`}
+        <button class="btn-outline btn-sm" onclick="deleteProfileAddress(${a.id})">Delete</button>
+      </div>
+    </div>`).join('');
+}
+
+async function addProfileAddress() {
+  const label = document.getElementById('addr-label').value.trim();
+  const full_name = document.getElementById('addr-full').value.trim();
+  const phone = document.getElementById('addr-phone').value.trim();
+  const line1 = document.getElementById('addr-line1').value.trim();
+  const line2 = document.getElementById('addr-line2').value.trim();
+  const city = document.getElementById('addr-city').value.trim();
+  const pincode = document.getElementById('addr-pin').value.trim();
+  const is_default = document.getElementById('addr-default').checked;
+  if (!full_name || !phone || !line1 || !city || !pincode) { toast('Please fill required address fields', '#C62828'); return; }
+  try {
+    await apiFetch('/users/addresses', { method: 'POST', body: { label, full_name, phone, line1, line2, city, state: '', pincode, is_default } });
+    toast('Address added');
+    // Clear form
+    ['addr-label','addr-full','addr-phone','addr-line1','addr-line2','addr-city','addr-pin'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('addr-default').checked = false;
+    currentAddresses = await apiFetch('/users/addresses');
+    renderProfileAddresses();
+  } catch (e) { toast('Could not add address', '#C62828'); }
+}
+
+async function deleteProfileAddress(id) {
+  if (!confirm('Delete this address?')) return;
+  try {
+    await apiFetch(`/users/addresses/${id}`, { method: 'DELETE' });
+    currentAddresses = await apiFetch('/users/addresses');
+    renderProfileAddresses();
+    toast('Address deleted');
+  } catch (e) { toast('Delete failed', '#C62828'); }
+}
+
+async function setDefaultAddress(id) {
+  try {
+    await apiFetch(`/users/addresses/${id}`, { method: 'PUT', body: { is_default: true, label: '', full_name: currentAddresses.find(a=>a.id===id)?.full_name || '', phone: currentAddresses.find(a=>a.id===id)?.phone || '', line1: currentAddresses.find(a=>a.id===id)?.line1 || '', line2: currentAddresses.find(a=>a.id===id)?.line2 || '', city: currentAddresses.find(a=>a.id===id)?.city || '', state: '', pincode: currentAddresses.find(a=>a.id===id)?.pincode || '' } });
+    currentAddresses = await apiFetch('/users/addresses');
+    renderProfileAddresses();
+    toast('Set as default');
+  } catch (e) { toast('Failed to update', '#C62828'); }
+}
+
+function onCheckoutAddressChange() {
+  const select = document.getElementById('saved-address-select');
+  if (!select) return;
+  const selectedId = select.value;
+  const saveRow = document.getElementById('checkout-save-address-row');
+  if (!saveRow) return;
+  if (!selectedId) {
+    saveRow.style.display = 'flex';
+    return;
+  }
+  const address = currentAddresses.find(a => String(a.id) === selectedId);
+  if (!address) return;
+  document.getElementById('c-name').value = address.full_name || document.getElementById('c-name').value;
+  document.getElementById('c-phone').value = address.phone || document.getElementById('c-phone').value;
+  document.getElementById('c-addr').value = `${address.line1}${address.line2 ? ', ' + address.line2 : ''}`;
+  document.getElementById('c-city').value = address.city || document.getElementById('c-city').value;
+  document.getElementById('c-pin').value = address.pincode || document.getElementById('c-pin').value;
+  saveRow.style.display = 'none';
+}
+
+function logout() {
+  authToken = '';
+  currentUser = null;
+  localStorage.removeItem('mg_token');
+  toast('Logged out successfully');
+  updateAuthUI();
+  showPage('home');
+}
+
+async function loadPaymentSettings() {
+  try {
+    paymentSettings = await apiFetch('/payment-settings');
+    const label = document.getElementById('upi-id-label');
+    if (label) label.textContent = paymentSettings.upi_id || 'your UPI ID';
+
+    const upiIdInput = document.getElementById('setting-upi-id');
+    const upiQrInput = document.getElementById('setting-upi-qr');
+    if (upiIdInput) upiIdInput.value = paymentSettings.upi_id || '';
+    if (upiQrInput) upiQrInput.value = paymentSettings.upi_qr || '';
+
+    const qr = document.getElementById('upi-qr-preview');
+    const qrContainer = document.getElementById('upi-preview-container');
+    if (qr && qrContainer) {
+      if (paymentSettings.upi_qr) {
+        qr.src = paymentSettings.upi_qr;
+        qr.style.display = 'block';
+        qrContainer.style.display = 'block';
+      } else {
+        qr.style.display = 'none';
+        qrContainer.style.display = 'none';
+      }
+    }
+  } catch (e) {
+    console.warn('Unable to load payment settings', e);
+  }
+}
+
+// ── Payment methods (public + admin) ───────────────────────────────────────
+let paymentMethods = { upi: true, cod: true };
+async function loadPaymentMethods() {
+  try {
+    const res = await apiFetch('/payment-methods');
+    paymentMethods = res.methods || { upi: true, cod: true };
+    renderPaymentMethods();
+  } catch (e) {
+    console.warn('Could not load payment methods, using defaults', e);
+    paymentMethods = { upi: true, cod: true };
+    renderPaymentMethods();
+  }
+}
+
+function renderPaymentMethods() {
+  const container = document.getElementById('payment-methods-list');
+  if (!container) return;
+  const items = [];
+  if (paymentMethods.upi) items.push({ key: 'upi', label: 'UPI / GPay / PhonePe' });
+  if (paymentMethods.cod) items.push({ key: 'cod', label: 'Cash on Delivery' });
+  if (!items.length) {
+    container.innerHTML = '<div style="color:#C62828">No payment methods are currently enabled.</div>';
+    return;
+  }
+  container.innerHTML = items.map((m, i) => `<label><input type="radio" name="pay" value="${m.key}" ${i===0? 'checked' : ''}> ${m.label}</label>`).join('');
+  document.querySelectorAll('input[name="pay"]').forEach(el => el.onchange = renderPaymentInfo);
+}
+
+async function loadAdminPaymentMethods() {
+  try {
+    const methods = await apiFetch('/admin/payment-methods');
+    renderAdminPaymentMethods(methods);
+  } catch (e) {
+    const container = document.getElementById('admin-payment-methods-list');
+    if (container) container.innerHTML = '<div style="color:#C62828">Unable to load admin payment methods.</div>';
+  }
+}
+
+function renderAdminPaymentMethods(methods) {
+  const container = document.getElementById('admin-payment-methods-list');
+  if (!container) return;
+  container.innerHTML = Object.keys(methods).map(k => `
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <div style="font-weight:500">${k.toUpperCase()}</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div style="font-size:13px;color:var(--soft);margin-right:8px">${methods[k] ? 'Enabled' : 'Disabled'}</div>
+        <button class="btn-outline btn-sm" onclick="toggleAdminPaymentMethod('${k}')">Toggle</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function toggleAdminPaymentMethod(method) {
+  try {
+    await apiFetch(`/admin/payment-methods/${method}/toggle`, { method: 'POST', body: {} });
+    toast('Payment method updated');
+    await loadAdminPaymentMethods();
+    await loadPaymentMethods();
+  } catch (e) {
+    toast('Unable to update payment method', '#C62828');
+  }
+}
+
+function renderPaymentInfo() {
+  const selected = document.querySelector('input[name="pay"]:checked')?.value;
+  const info = document.getElementById('upi-info');
+  if (!info) return;
+  const upiLabel = document.getElementById('upi-id-label');
+  const qr = document.getElementById('upi-qr-preview');
+  if (selected === 'upi') {
+    upiLabel.textContent = paymentSettings.upi_id || 'your UPI ID';
+    if (paymentSettings.upi_qr) {
+      qr.src = paymentSettings.upi_qr;
+      qr.style.display = 'block';
+    } else {
+      qr.style.display = 'none';
+    }
+    info.style.display = 'block';
+    info.querySelector('.payment-note')?.remove();
+    const note = document.createElement('div');
+    note.className = 'payment-note';
+    note.style.marginTop = '0.75rem';
+    note.style.fontSize = '13px';
+    note.style.color = '#A65D00';
+    note.textContent = 'This order will remain pending until your UPI payment is verified by the store.';
+    info.appendChild(note);
+  } else {
+    info.style.display = 'none';
+  }
+}
+
+function renderUpiPreview() {
+  const url = document.getElementById('setting-upi-qr').value.trim();
+  const preview = document.getElementById('upi-preview');
+  const container = document.getElementById('upi-preview-container');
+  if (!preview || !container) return;
+  if (upiQrFile) {
+    preview.src = URL.createObjectURL(upiQrFile);
+    container.style.display = 'block';
+    return;
+  }
+  if (url) {
+    preview.src = url;
+    container.style.display = 'block';
+  } else {
+    container.style.display = 'none';
+  }
+}
+
+function handleUpiQrUpload(event) {
+  upiQrFile = event.target.files?.[0] || null;
+  const uploadNote = document.getElementById('setting-upi-upload-note');
+  if (upiQrFile) {
+    uploadNote.textContent = `Selected file: ${upiQrFile.name}. Click Upload to save.`;
+  } else {
+    uploadNote.textContent = 'Choose a PNG/JPG/WebP file to upload.';
+  }
+  renderUpiPreview();
+}
+
+async function uploadUpiQr() {
+  if (!upiQrFile) return null;
+  const form = new FormData();
+  form.append('qrImage', upiQrFile);
+  const res = await fetch(API + '/payment-settings/upload', {
+    method: 'POST',
+    headers: authToken ? { Authorization: `Bearer ${authToken}` } : {},
+    body: form,
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Upload failed');
+  upiQrFile = null;
+  const uploadInput = document.getElementById('setting-upi-upload');
+  if (uploadInput) uploadInput.value = '';
+  return data.upi_qr;
+}
+
+async function savePaymentSettings() {
+  const upiId = document.getElementById('setting-upi-id').value.trim();
+  const upiQrField = document.getElementById('setting-upi-qr');
+  let upiQr = upiQrField ? upiQrField.value.trim() : '';
+  try {
+    if (upiQrFile) {
+      const uploaded = await uploadUpiQr();
+      if (uploaded) {
+        upiQr = uploaded;
+        if (upiQrField) upiQrField.value = uploaded;
+      }
+    }
+    await apiFetch('/payment-settings', { method: 'PUT', body: { upi_id: upiId, upi_qr: upiQr } });
+    paymentSettings = { upi_id: upiId, upi_qr: upiQr };
+    renderUpiPreview();
+    renderPaymentInfo();
+    toast('Payment settings saved');
+  } catch (e) {
+    toast('Unable to save payment settings', '#C62828');
+  }
+}
+
 // ── Page routing ──────────────────────────────────────────────────────────────
-function showPage(p) {
+async function showPage(p) {
   document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.nav-links a').forEach(el => el.classList.remove('active'));
-  document.getElementById('page-' + p).classList.add('active');
+  const page = document.getElementById('page-' + p);
+  if (page) page.classList.add('active');
   const navEl = document.getElementById('nav-' + p);
   if (navEl) navEl.classList.add('active');
   if (p === 'home')     loadHome();
   if (p === 'shop')     loadShop();
   if (p === 'cart')     renderCart();
-  if (p === 'admin')    loadAdmin();
-  if (p === 'checkout') renderOrderSummary();
+  if (p === 'admin') {
+    if (!currentUser || currentUser.role !== 'admin') {
+      setAuthMode('login');
+      showPage('auth');
+      return;
+    }
+    loadAdmin();
+  }
+  if (p === 'checkout') {
+    if (!currentUser) {
+      setAuthMode('login');
+      showPage('auth');
+      toast('Please login before checkout', '#E65100');
+      return;
+    }
+    await loadCheckoutAddresses();
+    renderOrderSummary();
+    renderPaymentInfo();
+  }
+  if (p === 'auth') {
+    setAuthMode('login');
+  }
+  if (p === 'profile') {
+    if (!currentUser) { setAuthMode('login'); showPage('auth'); toast('Please login to view profile', '#E65100'); return; }
+    await loadProfilePage();
+  }
 }
 
 // ── Toast ─────────────────────────────────────────────────────────────────────
@@ -451,13 +1159,17 @@ function productCard(p) {
   const tagLabel   = p.type === 'premium' ? 'Premium' : p.type === 'bulk' ? 'Bulk Deal' : 'Seasonal';
   const dotClass   = outOfStock ? 'out' : lowStock ? 'low' : '';
   const stockLabel = outOfStock ? 'Out of stock' : lowStock ? `Only ${p.stock}kg left` : 'In stock';
+  const isFav = favoritesSet && favoritesSet.has && favoritesSet.has(p.id);
   return `
     <div class="product-card">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
         <span class="tag ${tagClass}">${tagLabel}</span>
-        <div class="stock-indicator"><div class="stock-dot ${dotClass}"></div>${stockLabel}</div>
+        <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+          <button class="add-btn" style="background:transparent;border:none;padding:6px 8px;font-size:18px;cursor:pointer;" onclick="toggleFavorite(${p.id})">${isFav ? '♥' : '♡'}</button>
+          <div class="stock-indicator"><div class="stock-dot ${dotClass}"></div>${stockLabel}</div>
+        </div>
       </div>
-      <div class="product-emoji">${p.emoji}</div>
+      ${p.image ? `<div style="text-align:center;margin:.5rem 0"><img src="${p.image}" style="max-height:120px;object-fit:contain;display:block;margin:0 auto;border-radius:12px;border:1px solid var(--border)"></div>` : `<div class="product-emoji">${p.emoji}</div>`}
       <div>
         <div class="product-name">${p.name}</div>
         <div class="product-origin">📍 ${p.origin || '—'}</div>
@@ -497,7 +1209,12 @@ async function loadShop() {
   const grid = document.getElementById('shop-grid');
   grid.innerHTML = '<div class="loading">Loading mangoes…</div>';
   try {
-    allProducts = await apiFetch('/products');
+    if (currentFilter === 'favorites') {
+      // server will require auth for favorites
+      allProducts = await apiFetch('/products?favorites=true');
+    } else {
+      allProducts = await apiFetch('/products');
+    }
     renderShopGrid();
   } catch(e) {
     grid.innerHTML = '<p style="color:#C62828">⚠️ Server not reachable.</p>';
@@ -514,7 +1231,11 @@ function filterShop(f, el) {
   document.querySelectorAll('.filter-pills .pill').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
   currentFilter = f;
-  renderShopGrid();
+  if (f === 'favorites') {
+    loadShop();
+  } else {
+    renderShopGrid();
+  }
 }
 
 // ── CART ──────────────────────────────────────────────────────────────────────
@@ -597,6 +1318,8 @@ function renderOrderSummary() {
     <div style="border-top:1px solid var(--border);margin-top:10px;padding-top:10px;display:flex;justify-content:space-between;font-weight:500">
       <span>Total</span><span style="color:var(--gold);font-family:'Playfair Display',serif;font-size:18px">₹${total}</span>
     </div>`;
+  document.querySelectorAll('input[name="pay"]').forEach(el => el.onchange = renderPaymentInfo);
+  renderPaymentInfo();
 }
 
 async function placeOrder() {
@@ -606,6 +1329,9 @@ async function placeOrder() {
   const city  = document.getElementById('c-city').value.trim();
   const pin   = document.getElementById('c-pin').value.trim();
   const pay   = document.querySelector('input[name="pay"]:checked')?.value || 'upi';
+  const selectedAddressId = document.getElementById('saved-address-select')?.value;
+  const saveAddress = document.getElementById('checkout-save-address')?.checked;
+  if (!currentUser) { toast('Login required to place an order', '#C62828'); return; }
   if (!name || !phone || !addr) { toast('Please fill in Name, Phone and Address', '#C62828'); return; }
   if (!cart.length) { toast('Your cart is empty!', '#C62828'); return; }
 
@@ -614,34 +1340,113 @@ async function placeOrder() {
   const total = sub + del;
 
   try {
-    const result = await apiFetch('/orders', {
-      method: 'POST',
-      body: {
-        customer_name: name, phone, address: addr, city, pincode: pin, payment: pay,
-        items: cart.map(i => ({ id: i.id, name: i.name, emoji: i.emoji, qty: i.qty, price: i.price })),
-        subtotal: sub, delivery: del, total,
-      },
-    });
+    const body = {
+      customer_name: name,
+      phone,
+      address: addr,
+      city,
+      pincode: pin,
+      payment: pay,
+      items: cart.map(i => ({ id: i.id, name: i.name, emoji: i.emoji, qty: i.qty, price: i.price })),
+      subtotal: sub,
+      delivery: del,
+      total,
+    };
+    if (selectedAddressId) {
+      body.address_id = selectedAddressId;
+    } else if (saveAddress) {
+      body.new_address = {
+        full_name: name,
+        phone,
+        line1: addr,
+        city,
+        pincode: pin,
+        is_default: false,
+      };
+      body.save_address = true;
+    }
+    const result = await apiFetch('/orders', { method: 'POST', body });
+    // Use server-returned order, clear cart and re-render immediately
+    const createdOrderId = result?.order?.id || result?.id;
     cart = [];
     updateCartBadge();
+    renderCart();
     // Refresh product list so stock updates reflect
     allProducts = await apiFetch('/products');
+    const paymentNote = pay === 'upi' ?
+      `<div style="margin-top:10px;font-size:14px;color:var(--mid)">Please pay using UPI ID <strong>${paymentSettings.upi_id || 'your UPI ID'}</strong> before dispatch. ${paymentSettings.upi_qr ? '<div style="margin-top:8px"><img src="' + paymentSettings.upi_qr + '" style="max-width:160px;border-radius:14px;border:1px solid #E0D2B4"></div>' : ''}<div style="margin-top:8px;color:#A65D00">Your order is pending until payment is verified by the store.</div></div>` :
+      '<div style="margin-top:10px;font-size:14px;color:var(--mid)">Cash on Delivery selected. Please keep the exact amount ready.</div>';
     document.getElementById('checkout-form').innerHTML = `
       <div class="success-msg">
         <span class="success-icon">✅</span>
         <div style="font-size:22px;font-weight:500;margin-bottom:8px">Order Placed Successfully!</div>
         <div>Your mangoes are on their way. Expected delivery in 48 hours.</div>
-        <div style="font-size:13px;margin-top:10px;opacity:.8">Order ID: #MG-${String(result.id).padStart(4,'0')}</div>
-        <button class="btn-primary" style="margin-top:1.5rem" onclick="showPage('home')">Continue Shopping</button>
+        ${paymentNote}
+        <div style="font-size:13px;margin-top:10px;opacity:.8">Order ID: #MG-${String(createdOrderId || result.id).padStart(4,'0')}</div>
+        ${pay === 'upi' ? `
+          <div style="margin-top:12px">
+            <div style="font-size:13px;color:var(--soft);margin-bottom:6px">Upload payment screenshot / receipt (PNG, JPG, PDF) so we can verify faster</div>
+            <input type="file" id="proof-file" accept="image/png,image/jpeg,image/webp,application/pdf" style="width:100%" />
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button class="btn-primary" onclick="uploadPaymentProof(${result.id})">Upload proof</button>
+              <button class="btn-outline" onclick="showPage('home')">Continue Shopping</button>
+            </div>
+            <div id="proof-upload-status" style="margin-top:8px;font-size:13px;color:var(--soft)"></div>
+          </div>
+        ` : `<button class="btn-primary" style="margin-top:1.5rem" onclick="showPage('home')">Continue Shopping</button>`}
       </div>`;
   } catch(e) {
+    if (e.code === 'COD_LIMIT_REACHED') {
+      document.getElementById('cod-modal-msg').textContent = e.message || 'You already have 2 active COD orders. COD is disabled until those are delivered.';
+      document.getElementById('cod-modal').classList.add('open');
+      return;
+    }
     toast('Order failed: ' + e.message, '#C62828');
   }
 }
 
 // ── ADMIN ─────────────────────────────────────────────────────────────────────
 async function loadAdmin() {
-  await Promise.all([loadStats(), loadAdminProducts()]);
+  await Promise.all([loadStats(), loadAdminProducts(), loadPaymentSettings(), loadAdminPaymentMethods()]);
+  loadReports();
+}
+
+async function loadReports() {
+  const container = document.getElementById('reports-container');
+  container.innerHTML = '<div class="loading">Loading reports…</div>';
+  try {
+    const report = await apiFetch('/admin/overview');
+    const statusRows = report.ordersByStatus.map(s => `<div style="display:flex;justify-content:space-between;padding:.45rem 0;border-bottom:1px solid var(--border)"><span>${s.status}</span><span>${s.count}</span></div>`).join('');
+    const paymentRows = report.revenueByPayment.map(p => `<div style="display:flex;justify-content:space-between;padding:.45rem 0;border-bottom:1px solid var(--border)"><span>${p.payment.toUpperCase()}</span><span>₹${p.revenue}</span></div>`).join('');
+    const topUsers = report.topUsers.map(u => `<div style="padding:.5rem 0;border-bottom:1px solid var(--border)"><strong>${u.email}</strong> • ${u.role}<div style="font-size:13px;color:var(--soft);margin-top:2px">Orders: ${u.orders} • Spent: ₹${u.spent}</div></div>`).join('') || '<div style="color:var(--soft)">No registered users yet.</div>';
+    container.innerHTML = `
+      <div style="display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-bottom:1.5rem">
+        <div class="stat-card"><div class="stat-card-label">Total orders</div><div class="stat-card-val">${report.totalOrders}</div></div>
+        <div class="stat-card"><div class="stat-card-label">Revenue</div><div class="stat-card-val">₹${report.totalRevenue.toLocaleString('en-IN')}</div></div>
+        <div class="stat-card"><div class="stat-card-label">Products</div><div class="stat-card-val">${report.totalProducts}</div></div>
+        <div class="stat-card"><div class="stat-card-label">Customers</div><div class="stat-card-val">${report.userCount}</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div style="background:white;border:1px solid var(--border);border-radius:16px;padding:1rem"><div class="panel-title">Orders by status</div>${statusRows}</div>
+        <div style="background:white;border:1px solid var(--border);border-radius:16px;padding:1rem"><div class="panel-title">Revenue by payment</div>${paymentRows}</div>
+      </div>
+      <div style="background:white;border:1px solid var(--border);border-radius:16px;padding:1rem;margin-top:1rem"><div class="panel-title">Top customers</div>${topUsers}</div>`;
+  } catch (e) {
+    container.innerHTML = '<p style="color:#C62828">Could not load reports.</p>';
+  }
+}
+
+async function savePaymentSettings() {
+  const upiId = document.getElementById('setting-upi-id').value.trim();
+  const upiQr = document.getElementById('setting-upi-qr').value.trim();
+  try {
+    await apiFetch('/payment-settings', { method: 'PUT', body: { upi_id: upiId, upi_qr: upiQr } });
+    paymentSettings = { upi_id: upiId, upi_qr: upiQr };
+    renderUpiPreview();
+    toast('Payment settings saved');
+  } catch (e) {
+    toast('Unable to save payment settings', '#C62828');
+  }
 }
 
 async function loadStats() {
@@ -666,7 +1471,7 @@ async function loadAdminProducts() {
     const tbody = document.getElementById('admin-product-tbody');
     tbody.innerHTML = allProducts.map(p => `
       <tr>
-        <td>${p.emoji} <strong>${p.name}</strong></td>
+        <td>${p.image ? `<img src="${p.image}" style="height:48px;border-radius:8px;margin-right:8px;vertical-align:middle">` : p.emoji} <strong>${p.name}</strong></td>
         <td style="font-size:13px;color:var(--soft)">${p.origin || '—'}</td>
         <td style="font-weight:500">₹${p.price}/kg</td>
         <td><span class="tag ${p.stock < 20 ? 'tag-seasonal' : 'tag-fresh'}">${p.stock} kg</span></td>
@@ -679,6 +1484,52 @@ async function loadAdminProducts() {
       </tr>`).join('');
   } catch(e) {
     document.getElementById('admin-product-tbody').innerHTML = `<tr><td colspan="7" style="color:#C62828;padding:1rem">Could not load products.</td></tr>`;
+  }
+}
+
+async function loadAdminUsers() {
+  const tbody = document.getElementById('admin-users-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="7" class="loading">Loading users…</td></tr>';
+  try {
+    const users = await apiFetch('/admin/users');
+    if (!users || users.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" style="color:var(--soft);padding:1rem">No users found.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = users.map(u => `
+      <tr>
+        <td>#${u.id}</td>
+        <td style="font-weight:500">${u.email}</td>
+        <td style="font-size:13px;color:var(--soft)">${u.role || 'user'}</td>
+        <td style="font-size:13px;color:var(--soft)">${u.created_at ? new Date(u.created_at).toLocaleString() : '—'}</td>
+        <td>${u.disabled ? '<span style="color:#C62828;font-weight:600">Disabled</span>' : '<span style="color:#2D6A35;font-weight:600">Active</span>'}</td>
+        <td style="font-size:13px;color:var(--soft)">${u.disabled_reason || ''}</td>
+        <td>
+          <button class="edit-btn" onclick="toggleUserDisabled(${u.id}, ${u.disabled ? 'true' : 'false'})">${u.disabled ? 'Enable' : 'Disable'}</button>
+        </td>
+      </tr>`).join('');
+  } catch (e) {
+    tbody.innerHTML = `<tr><td colspan="7" style="color:#C62828;padding:1rem">${e.message}</td></tr>`;
+  }
+}
+
+async function toggleUserDisabled(id, currentlyDisabled) {
+  try {
+    if (currentlyDisabled) {
+      if (!confirm('Enable this user account?')) return;
+      await apiFetch(`/admin/users/${id}/disable`, { method: 'PATCH', body: { disabled: false } });
+      toast('User enabled');
+    } else {
+      const ok = confirm('Disable this user account? The user will be prevented from logging in and placing orders.');
+      if (!ok) return;
+      const reason = prompt('Reason for disabling (optional)') || '';
+      await apiFetch(`/admin/users/${id}/disable`, { method: 'PATCH', body: { disabled: true, reason } });
+      toast('User disabled');
+    }
+    loadAdminUsers();
+  } catch (e) {
+    toast('Action failed: ' + e.message, '#C62828');
   }
 }
 
@@ -695,12 +1546,18 @@ async function loadOrders() {
           <div style="font-weight:500;font-size:15px;margin:2px 0">${o.customer_name}</div>
           <div style="font-size:13px;color:var(--mid)">${o.items.map(i => `${i.emoji} ${i.name} ×${i.qty}kg`).join(', ')}</div>
           <div style="font-size:12px;color:var(--soft);margin-top:2px">📞 ${o.phone} · ${o.city || o.address}</div>
+          <div style="margin-top:8px;font-size:13px;color:var(--soft)">Payment: <strong>${o.payment.toUpperCase()}</strong> • Status: <strong>${o.payment_status}</strong></div>
+          ${o.payment_proof ? `<div style="margin-top:8px"><a href="${o.payment_proof}" target="_blank">View payment proof</a></div>` : ''}
         </div>
         <div style="display:flex;align-items:center;gap:1rem">
           <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--gold);font-weight:700">₹${o.total}</div>
           <select class="order-status-select" onchange="updateOrderStatus(${o.id},this.value)">
             ${['preparing','shipped','delivered','cancelled'].map(s => `<option value="${s}" ${o.status===s?'selected':''}>${s.charAt(0).toUpperCase()+s.slice(1)}</option>`).join('')}
           </select>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            ${o.payment === 'upi' ? `<input type="text" id="remark-${o.id}" placeholder="Remark (optional)" class="form-input" style="width:160px" />
+            <button class="btn-primary btn-sm" onclick="markPaid(${o.id})">Mark Paid</button>` : ''}
+          </div>
         </div>
       </div>`).join('');
   } catch(e) {
@@ -715,6 +1572,40 @@ async function updateOrderStatus(id, status) {
     loadStats();
   } catch(e) {
     toast('Failed to update status', '#C62828');
+  }
+}
+
+async function uploadPaymentProof(orderId) {
+  const input = document.getElementById('proof-file');
+  const status = document.getElementById('proof-upload-status');
+  if (!input || !input.files || input.files.length === 0) { status.textContent = 'No file selected'; return; }
+  const file = input.files[0];
+  const allowed = ['image/png','image/jpeg','image/webp','application/pdf'];
+  if (!allowed.includes(file.type)) { status.textContent = 'Invalid file type'; return; }
+  if (file.size > 5 * 1024 * 1024) { status.textContent = 'File too large (max 5MB)'; return; }
+  status.textContent = 'Uploading…';
+  try {
+    const form = new FormData();
+    form.append('proof', file);
+    const res = await fetch(API + `/orders/${orderId}/upload-proof`, { method: 'POST', body: form, headers: authToken ? { 'Authorization': 'Bearer ' + authToken } : {} });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Upload failed');
+    status.textContent = 'Uploaded. Admin will verify shortly.';
+    loadOrders();
+  } catch (e) {
+    status.textContent = e.message;
+  }
+}
+
+async function markPaid(orderId) {
+  const remark = document.getElementById(`remark-${orderId}`).value || '';
+  try {
+    await apiFetch(`/orders/${orderId}/payment-status`, { method: 'PATCH', body: { payment_status: 'paid', remark } });
+    toast('Marked as paid');
+    loadOrders();
+    loadStats();
+  } catch (e) {
+    toast('Failed to mark paid', '#C62828');
   }
 }
 
@@ -759,10 +1650,25 @@ function adminTab(tab, el) {
   el.classList.add('active');
   document.getElementById('atab-products').style.display = tab === 'products' ? 'block' : 'none';
   document.getElementById('atab-orders').style.display   = tab === 'orders'   ? 'block' : 'none';
+  document.getElementById('atab-users').style.display    = tab === 'users'    ? 'block' : 'none';
   document.getElementById('atab-stock').style.display    = tab === 'stock'    ? 'block' : 'none';
+  document.getElementById('atab-reports').style.display  = tab === 'reports'  ? 'block' : 'none';
+  document.getElementById('atab-settings').style.display = tab === 'settings' ? 'block' : 'none';
   if (tab === 'products') loadAdminProducts();
   if (tab === 'orders')   loadOrders();
+  if (tab === 'users')    loadAdminUsers();
   if (tab === 'stock')    loadStockManager();
+  if (tab === 'reports')  loadReports();
+  if (tab === 'settings') loadSettings();
+}
+
+function loadSettings() {
+  const upiId = document.getElementById('setting-upi-id');
+  const upiQr = document.getElementById('setting-upi-qr');
+  if (!upiId || !upiQr) return;
+  upiId.value = paymentSettings.upi_id || '';
+  upiQr.value = paymentSettings.upi_qr || '';
+  renderUpiPreview();
 }
 
 // ── PRODUCT MODAL ─────────────────────────────────────────────────────────────
@@ -777,6 +1683,9 @@ function openProductModal() {
   document.getElementById('p-desc').value     = '';
   document.getElementById('p-type').value     = 'seasonal';
   document.getElementById('p-featured').value = '0';
+  // clear image input & preview
+  const imgIn = document.getElementById('p-image'); if (imgIn) imgIn.value = '';
+  const prevCont = document.getElementById('p-image-preview-container'); if (prevCont) prevCont.style.display = 'none';
   document.getElementById('product-modal').classList.add('open');
 }
 
@@ -793,11 +1702,27 @@ function openEditModal(id) {
   document.getElementById('p-desc').value     = p.description || '';
   document.getElementById('p-type').value     = p.type;
   document.getElementById('p-featured').value = p.featured ? '1' : '0';
+  // if product has image, show preview
+  const prevCont = document.getElementById('p-image-preview-container');
+  const prevImg = document.getElementById('p-image-preview');
+  const imgIn = document.getElementById('p-image');
+  if (p.image) {
+    if (prevImg) prevImg.src = p.image;
+    if (prevCont) prevCont.style.display = 'block';
+  } else {
+    if (prevCont) prevCont.style.display = 'none';
+    if (prevImg) prevImg.src = '';
+  }
+  if (imgIn) imgIn.value = '';
   document.getElementById('product-modal').classList.add('open');
 }
 
 function closeModal() {
   document.getElementById('product-modal').classList.remove('open');
+}
+
+function closeCodModal() {
+  document.getElementById('cod-modal').classList.remove('open');
 }
 
 async function saveProduct() {
@@ -813,18 +1738,63 @@ async function saveProduct() {
   };
   if (!payload.name || !payload.price) { toast('Name and price are required', '#C62828'); return; }
   try {
+    let prodId = editingProductId;
     if (editingProductId) {
       await apiFetch(`/products/${editingProductId}`, { method: 'PUT', body: payload });
-      toast('Product updated ✅');
+      prodId = editingProductId;
     } else {
-      await apiFetch('/products', { method: 'POST', body: payload });
-      toast('Product added ✅');
+      const created = await apiFetch('/products', { method: 'POST', body: payload });
+      prodId = created.id;
     }
+    // if an image file selected, upload it using multipart
+    const imageInput = document.getElementById('p-image');
+    if (imageInput && imageInput.files && imageInput.files.length > 0) {
+      const fd = new FormData();
+      fd.append('image', imageInput.files[0]);
+      await apiUpload(`/admin/products/${prodId}/image`, fd, 'POST');
+    }
+    toast(editingProductId ? 'Product updated ✅' : 'Product added ✅');
     closeModal();
     loadAdminProducts();
     loadStats();
   } catch(e) {
     toast('Error: ' + e.message, '#C62828');
+  }
+}
+
+// helper to upload multipart with auth
+async function apiUpload(path, formData, method = 'POST') {
+  const headers = {};
+  if (authToken) headers.Authorization = `Bearer ${authToken}`;
+  const res = await fetch(API + path, { method, headers, body: formData });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || data.message || 'Upload failed');
+  return data;
+}
+
+function handleProductImageSelect(ev) {
+  const f = ev.target.files && ev.target.files[0];
+  const prevCont = document.getElementById('p-image-preview-container');
+  const prevImg = document.getElementById('p-image-preview');
+  if (!f) {
+    if (prevCont) prevCont.style.display = 'none';
+    if (prevImg) prevImg.src = '';
+    return;
+  }
+  const url = URL.createObjectURL(f);
+  if (prevImg) prevImg.src = url;
+  if (prevCont) prevCont.style.display = 'block';
+}
+
+function removeSelectedProductImage() {
+  const imageInput = document.getElementById('p-image');
+  if (imageInput) imageInput.value = '';
+  const prevCont = document.getElementById('p-image-preview-container'); if (prevCont) prevCont.style.display = 'none';
+  const prevImg = document.getElementById('p-image-preview'); if (prevImg) prevImg.src = '';
+  // if editing existing product, call delete endpoint to remove stored image
+  if (editingProductId) {
+    fetch(API + `/admin/products/${editingProductId}/image`, { method: 'DELETE', headers: authToken ? { Authorization: `Bearer ${authToken}` } : {} })
+      .then(r => r.json()).then(d => { if (d && d.success) { toast('Image removed'); loadAdminProducts(); } }).catch(()=>{});
   }
 }
 
@@ -842,7 +1812,13 @@ async function deleteProduct(id) {
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
-loadHome();
+(async function initApp() {
+  await loadCurrentUser();
+  await loadFavorites();
+  await loadPaymentSettings();
+  await loadPaymentMethods();
+  loadHome();
+})();
 </script>
 </body>
 </html>

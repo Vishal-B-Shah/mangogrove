@@ -48,6 +48,37 @@ The database is created automatically with 6 starter mango varieties.
 
 ---
 
+## Email / SMTP configuration (optional but recommended)
+
+The app sends verification and reset codes via email. By default it will create a test (Ethereal) account when no SMTP credentials are provided — this only prints a preview URL to server logs. For real email delivery, set one of the following sets of environment variables before running the server:
+
+- Generic SMTP server:
+  - `SMTP_HOST` (e.g. smtp.sendgrid.net)
+  - `SMTP_PORT` (e.g. 587 or 465)
+  - `SMTP_USER` (username for SMTP auth)
+  - `SMTP_PASS` (password for SMTP auth)
+  - `SMTP_SECURE` ("true" to use TLS on connect, otherwise "false")
+  - `SMTP_FROM` (optional; e.g. "MangoGrove <no-reply@example.com>")
+
+- OR Gmail SMTP (if you prefer Gmail):
+  - `GMAIL_USER` (your Gmail address)
+  - `GMAIL_PASS` (app password or SMTP password)
+
+If email delivery fails, the server will log detailed errors and return an error to API callers. Example (PowerShell):
+
+```powershell
+$env:SMTP_HOST = "smtp.example.com"
+$env:SMTP_PORT = "587"
+$env:SMTP_USER = "smtp-user"
+$env:SMTP_PASS = "smtp-pass"
+npm start
+```
+
+If you don't set any SMTP variables the server will use an Ethereal test account and log a preview URL that you can open to view the sent message.
+
+
+---
+
 ## Admin panel
 Click **Admin ⚙️** in the navigation bar.
 
